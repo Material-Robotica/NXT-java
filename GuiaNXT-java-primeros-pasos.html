@@ -163,9 +163,11 @@
   html{ scroll-behavior: smooth; }
   [id]{ scroll-margin-top: 16px; }
   @media print{ .section-title .top{ display:none; } }
-  .ej{ border-left: 3px solid var(--accent); padding: 10px 14px; background: var(--panel); border-radius: 0 10px 10px 0; margin: 12px 0 14px; border:1px solid var(--border); border-left:3px solid var(--accent); }
+  .ej{ padding: 10px 14px; background: var(--panel); border-radius: 0 10px 10px 0; margin: 12px 0 14px; border:1px solid var(--border); border-left:3px solid var(--accent); }
   .ej p.panel-title{ color: var(--accent); }
-  .ej ol{ margin-bottom:0; }
+  .ej ol, .ej ul{ margin-bottom:0; }
+  .meta{ display:flex; flex-wrap:wrap; gap:8px; margin: 0 0 12px; }
+  .meta span{ font-family: var(--mono); font-size: 11.5px; background: var(--panel-2); border:1px solid var(--border); border-radius: 999px; padding: 3px 10px; color: var(--muted); }
   footer{
     margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--border);
     text-align:center; font-family: var(--mono); font-size: 12px; color: var(--muted);
@@ -189,30 +191,35 @@
 <header>
   <div class="eyebrow">Robótica · LEGO NXT · Java</div>
   <h1>Programar el NXT en <span>Java</span>: primeros pasos</h1>
-  <p class="subtitle">De la estructura de un programa a la programación por comportamientos, con leJOS NXJ. Cada tema incluye ejemplos listos para subir y ejercicios.</p>
+  <p class="subtitle">De las partes del robot a la programación por comportamientos, con leJOS NXJ. Cada tema incluye ejemplos listos para subir y ejercicios.</p>
 </header>
 
 <nav class="toc panel" id="indice">
   <p class="panel-title">Índice</p>
   <div class="toc-grid">
+    <div><p class="toc-sec">El robot</p><ol>
+      <li value="1"><a href="#partes">Partes del NXT</a></li>
+    </ol></div>
     <div><p class="toc-sec">Fundamentos</p><ol>
-      <li value="1"><a href="#estructura">Estructura de un programa</a></li>
-      <li value="2"><a href="#brick">Pantalla, botones y sonido</a></li>
+      <li value="2"><a href="#estructura">Estructura de un programa</a></li>
+      <li value="3"><a href="#brick">Pantalla, botones y sonido</a></li>
+      <li value="4"><a href="#piano">Arrays: piano NXT</a></li>
     </ol></div>
     <div><p class="toc-sec">Movimiento</p><ol>
-      <li value="3"><a href="#motores">Motores</a></li>
-      <li value="4"><a href="#clase-auxiliar">Clase auxiliar con métodos propios</a></li>
-      <li value="5"><a href="#pilot">Navegación con DifferentialPilot</a></li>
+      <li value="5"><a href="#motores">Motores</a></li>
+      <li value="6"><a href="#clase-auxiliar">Clase auxiliar con métodos propios</a></li>
+      <li value="7"><a href="#menu">Programa con menú</a></li>
+      <li value="8"><a href="#pilot">Navegación con DifferentialPilot</a></li>
     </ol></div>
     <div><p class="toc-sec">Sensores</p><ol>
-      <li value="6"><a href="#sensores">Sensores: contacto y ultrasónico</a></li>
-      <li value="7"><a href="#luz">Sensor de luz y seguidor de línea</a></li>
+      <li value="9"><a href="#sensores">Sensores: contacto y ultrasónico</a></li>
+      <li value="10"><a href="#luz">Sensor de luz y seguidor de línea</a></li>
     </ol></div>
     <div><p class="toc-sec">Programación avanzada</p><ol>
-      <li value="8"><a href="#comportamientos">Comportamientos (Behavior y Arbitrator)</a></li>
+      <li value="11"><a href="#comportamientos">Comportamientos (Behavior y Arbitrator)</a></li>
     </ol></div>
     <div><p class="toc-sec">Proyectos</p><ol>
-      <li value="9"><a href="#proyectos">Proyectos sugeridos</a></li>
+      <li value="12"><a href="#proyectos">Proyectos sugeridos</a></li>
     </ol></div>
   </div>
 </nav>
@@ -220,13 +227,47 @@
 <div class="panel">
   <p class="panel-title">Antes de empezar</p>
   <p>Esta guía supone el entorno ya instalado y funcionando, según la guía <a href="GuiaNXT-lejos-vscode.html"><strong>Programar el NXT en Java con leJOS y VS Code</strong></a>: proyecto en VS Code, NXT emparejado por Bluetooth y <strong>Ctrl + Shift + B</strong> para compilar, subir y ejecutar.</p>
-  <p>Conexiones usadas en los ejemplos: motor izquierdo en <strong>B</strong>, motor derecho en <strong>C</strong>, sensor de contacto en <strong>1</strong>, sensor de luz en <strong>3</strong> y sensor ultrasónico en <strong>4</strong>.</p>
+  <p>Conexiones usadas en los ejemplos: motor izquierdo en <strong>B</strong>, motor derecho en <strong>C</strong>, sensor de contacto en <strong>1</strong>, sensor de luz en <strong>3</strong> y sensor ultrasónico en <strong>4</strong>. El puerto <strong>A</strong> queda libre para un tercer motor (por ejemplo, una pinza).</p>
 </div>
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>El robot</h3>
+
+<div class="step" id="partes">
+  <div class="num">01</div>
+  <div class="content">
+    <h2>Partes del NXT</h2>
+
+<p>El <strong>ladrillo NXT</strong> es la computadora del robot: tiene el procesador, la memoria, la pantalla, los botones y los puertos donde se conectan motores y sensores.</p>
+<div class="table-wrap"><table>
+<tr><th>Parte</th><th>Función</th></tr>
+<tr><td><strong>Pantalla</strong></td><td>Muestra el menú y los mensajes de los programas: 16 columnas × 8 filas, sin tildes ni eñes.</td></tr>
+<tr><td><strong>Botones</strong></td><td>Naranja (ENTER): encender y aceptar. Gris oscuro (ESCAPE): volver o cancelar. Grises claros (LEFT y RIGHT): moverse por el menú.</td></tr>
+<tr><td><strong>Puertos 1 a 4</strong> (abajo)</td><td>Entradas: ahí se conectan los <strong>sensores</strong>.</td></tr>
+<tr><td><strong>Puertos A, B y C</strong> (arriba)</td><td>Salidas: ahí se conectan los <strong>motores</strong>.</td></tr>
+<tr><td><strong>Puerto USB</strong></td><td>Se usa para instalar el firmware leJOS. Los programas se envían por <strong>Bluetooth</strong>.</td></tr>
+</table></div>
+<p><strong>Motores (actuadores).</strong> Son servomotores con un <strong>sensor de rotación incorporado</strong>, que mide cuántos grados giró el eje. Gracias a eso se puede pedir que un motor gire exactamente 360° o consultar cuánto avanzó.</p>
+<p><strong>Sensores (entradas).</strong> Permiten que el robot perciba su entorno:</p>
+<div class="table-wrap"><table>
+<tr><th>Sensor</th><th>Qué mide</th><th>Parecido en la vida real</th><th>Clase en leJOS</th></tr>
+<tr><td>Contacto</td><td>Si está presionado o no.</td><td>Un timbre o un interruptor.</td><td><code>TouchSensor</code></td></tr>
+<tr><td>Ultrasónico</td><td>Distancia a un objeto, en cm, con ondas de sonido.</td><td>El sensor de estacionamiento de un auto.</td><td><code>UltrasonicSensor</code></td></tr>
+<tr><td>Luz</td><td>Cantidad de luz reflejada (claro / oscuro).</td><td>Una fotocélula del alumbrado.</td><td><code>LightSensor</code></td></tr>
+<tr><td>Sonido</td><td>Volumen del sonido ambiente.</td><td>Un micrófono con medidor.</td><td><code>SoundSensor</code></td></tr>
+<tr><td>Color</td><td>Color de la superficie (hasta 6 colores) y luz.</td><td>Un escáner simple.</td><td><code>ColorSensor</code></td></tr>
+</table></div>
+<span class="badge warn">Según el kit</span>
+<p>El kit <strong>NXT 1.0</strong> trae sensor de luz y de sonido; el <strong>NXT 2.0</strong> trae sensor de color en su lugar. Son sensores distintos y en leJOS se usan con clases distintas. Antes de programar, revisar cuál tiene el robot (el de color tiene una lente con varias luces de colores; el de luz, una sola luz roja).</p>
+<p><strong>Cómo funciona un programa:</strong> el programa se envía al ladrillo; el ladrillo lee los sensores (puertos 1 a 4), decide qué hacer según las instrucciones y da órdenes a los motores (puertos A a C). Esto se repite muchas veces por segundo.</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Identificar en el robot del grupo qué hay conectado en cada puerto y anotarlo en una tabla.</li><li>Revisar si el kit tiene sensor de luz o de color.</li><li>Proponer un ejemplo de la vida cotidiana de una máquina que lea un sensor y mueva un motor según lo que lee.</li></ol></div>
+  </div>
+</div>
+
 
 <h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Fundamentos</h3>
 
 <div class="step" id="estructura">
-  <div class="num">01</div>
+  <div class="num">02</div>
   <div class="content">
     <h2>Estructura de un programa</h2>
 
@@ -260,7 +301,7 @@
 
 
 <div class="step" id="brick">
-  <div class="num">02</div>
+  <div class="num">03</div>
   <div class="content">
     <h2>Pantalla, botones y sonido</h2>
 
@@ -307,7 +348,50 @@
 </div>
 
 <p>En leJOS, <code>System.out.println()</code> también escribe en la pantalla del NXT, línea por línea y desplazando el texto hacia arriba. Es útil para mostrar mensajes de seguimiento.</p>
-<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Agregar al contador que con ENTER vuelva a 0.</li><li>Hacer que el contador no baje de 0 ni suba de 10, y que emita <code>Sound.buzz()</code> al intentar pasarse.</li><li>Tocar una escala con <code>Sound.playTone()</code>: por ejemplo, 262, 294, 330, 349, 392, 440, 494 y 523 Hz, 300 ms cada nota.</li></ol></div>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Agregar al contador que con ENTER vuelva a 0.</li><li>Hacer que el contador no baje de 0 ni suba de 10, y que emita <code>Sound.buzz()</code> al intentar pasarse.</li><li>Tocar una escala con <code>Sound.playTone()</code>: 262, 294, 330, 349, 392, 440, 494 y 523 Hz, 300 ms cada nota. Atención: <code>playTone()</code> no espera a que termine la nota, así que hay que agregar <code>Delay.msDelay(300)</code> después de cada una.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="piano">
+  <div class="num">04</div>
+  <div class="content">
+    <h2>Arrays: piano NXT</h2>
+
+<p>Un <strong>array</strong> guarda varios valores del mismo tipo bajo un solo nombre, numerados desde 0. En este programa, un array guarda las frecuencias de las notas y otro sus nombres: la nota número <code>actual</code> se toca con <code>notas[actual]</code> y se muestra con <code>nombres[actual]</code>.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Piano.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">Piano</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span>[] notas = {<span class="nu">262</span>, <span class="nu">294</span>, <span class="nu">330</span>, <span class="nu">349</span>, <span class="nu">392</span>, <span class="nu">440</span>, <span class="nu">494</span>, <span class="nu">523</span>};
+        <span class="ty">String</span>[] nombres = {<span class="st">"Do"</span>, <span class="st">"Re"</span>, <span class="st">"Mi"</span>, <span class="st">"Fa"</span>, <span class="st">"Sol"</span>, <span class="st">"La"</span>, <span class="st">"Si"</span>, <span class="st">"Do agudo"</span>};
+        <span class="kw">int</span> actual = <span class="nu">0</span>;
+        <span class="kw">int</span> boton = <span class="nu">0</span>;
+
+        <span class="kw">while</span> (boton != <span class="ty">Button</span>.<span class="ty">ID_ESCAPE</span>) {
+            <span class="ty">LCD</span>.clear();
+            <span class="ty">LCD</span>.drawString(<span class="st">"Piano NXT"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+            <span class="ty">LCD</span>.drawString(<span class="st">"Nota: "</span> + nombres[actual], <span class="nu">0</span>, <span class="nu">2</span>);
+            <span class="ty">LCD</span>.drawString(<span class="st">"&lt; &gt; cambiar"</span>, <span class="nu">0</span>, <span class="nu">5</span>);
+            <span class="ty">LCD</span>.drawString(<span class="st">"ENTER tocar"</span>, <span class="nu">0</span>, <span class="nu">6</span>);
+
+            boton = <span class="ty">Button</span>.waitForAnyPress();
+            <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_RIGHT</span>) {
+                actual = (actual + <span class="nu">1</span>) % notas.length;
+            } <span class="kw">else</span> <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_LEFT</span>) {
+                actual = (actual - <span class="nu">1</span> + notas.length) % notas.length;
+            } <span class="kw">else</span> <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_ENTER</span>) {
+                <span class="ty">Sound</span>.playTone(notas[actual], <span class="nu">400</span>);
+            }
+        }
+    }
+}</pre>
+</div>
+
+<p>El operador <code>%</code> (resto de la división) hace que la nota "dé la vuelta": después de la última vuelve a la primera, y antes de la primera va a la última. <code>notas.length</code> es la cantidad de elementos del array (8).</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Agregar dos notas más a los arrays (por ejemplo, 587 Hz "Re agudo" y 659 Hz "Mi agudo") sin cambiar nada más del programa. ¿Por qué funciona?</li><li>Crear un array <code>melodia</code> con los números de nota de una canción simple y tocarla completa con un <code>for</code> al presionar ESCAPE antes de salir.</li><li>Mostrar también la frecuencia de la nota en pantalla con <code>LCD.drawInt()</code>.</li></ol></div>
   </div>
 </div>
 
@@ -315,7 +399,7 @@
 <h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Movimiento</h3>
 
 <div class="step" id="motores">
-  <div class="num">03</div>
+  <div class="num">05</div>
   <div class="content">
     <h2>Motores</h2>
 
@@ -376,7 +460,7 @@
 
 
 <div class="step" id="clase-auxiliar">
-  <div class="num">04</div>
+  <div class="num">06</div>
   <div class="content">
     <h2>Clase auxiliar con métodos propios</h2>
 
@@ -388,6 +472,8 @@
   <pre><span class="kw">import</span> lejos.nxt.<span class="ty">Button</span>;
 <span class="kw">import</span> lejos.nxt.<span class="ty">LCD</span>;
 <span class="kw">import</span> lejos.nxt.<span class="ty">Motor</span>;
+<span class="kw">import</span> lejos.nxt.<span class="ty">Sound</span>;
+<span class="kw">import</span> lejos.util.<span class="ty">Delay</span>;
 
 <span class="kw">public</span> <span class="kw">class</span> <span class="ty">Robot</span> {
 
@@ -420,8 +506,36 @@
         <span class="ty">LCD</span>.drawString(texto, <span class="nu">0</span>, fila);
     }
 
+    <span class="cm">// sobrecarga: mismo nombre, distintos parametros</span>
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> mostrar(<span class="kw">int</span> numero, <span class="kw">int</span> fila) {
+        <span class="ty">LCD</span>.drawInt(numero, <span class="nu">0</span>, fila);
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> limpiar() {
+        <span class="ty">LCD</span>.clear();
+    }
+
+    <span class="cm">// borra la pantalla y escribe cuatro lineas</span>
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> pantalla(<span class="ty">String</span> l1, <span class="ty">String</span> l2, <span class="ty">String</span> l3, <span class="ty">String</span> l4) {
+        <span class="ty">LCD</span>.clear();
+        <span class="ty">LCD</span>.drawString(l1, <span class="nu">0</span>, <span class="nu">0</span>);
+        <span class="ty">LCD</span>.drawString(l2, <span class="nu">0</span>, <span class="nu">2</span>);
+        <span class="ty">LCD</span>.drawString(l3, <span class="nu">0</span>, <span class="nu">3</span>);
+        <span class="ty">LCD</span>.drawString(l4, <span class="nu">0</span>, <span class="nu">4</span>);
+    }
+
     <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> esperarBoton() {
         <span class="ty">Button</span>.waitForAnyPress();
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> esperar(<span class="kw">double</span> segundos) {
+        <span class="ty">Delay</span>.msDelay((<span class="kw">int</span>) (segundos * <span class="nu">1000</span>));
+    }
+
+    <span class="cm">// toca una nota y espera a que termine</span>
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> tono(<span class="kw">int</span> frecuencia, <span class="kw">int</span> milisegundos) {
+        <span class="ty">Sound</span>.playTone(frecuencia, milisegundos);
+        <span class="ty">Delay</span>.msDelay(milisegundos);
     }
 }</pre>
 </div>
@@ -443,14 +557,83 @@
 }</pre>
 </div>
 
+<p>Hay dos métodos <code>mostrar</code>: uno recibe un texto y otro un número. Es una <strong>sobrecarga</strong>: Java elige cuál usar según el tipo del dato que se le pasa.</p>
 <p>Guardar los dos archivos en <code>src</code>, abrir <code>Cuadrado.java</code> (el que tiene el <code>main</code>) y presionar <strong>Ctrl + Shift + B</strong>. <code>Robot.java</code> se compila sola.</p>
-<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Agregar a <code>Robot</code> un método <code>girar90Derecha()</code> que use el valor encontrado en el tema de motores.</li><li>Agregar un método <code>poligono(int lados)</code> que recorra un polígono regular (pista: el giro total es 360°, repartido entre los lados).</li><li>Dibujar un triángulo y un hexágono con <code>poligono()</code>.</li></ol></div>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Agregar a <code>Robot</code> un método <code>girar90Derecha()</code> que use el valor encontrado en el tema de motores.</li><li>Agregar un método <code>poligono(int lados)</code> que recorra un polígono regular (pista: el giro total es 360°, repartido entre los lados).</li><li>Dibujar un triángulo y un hexágono con <code>poligono()</code>.</li><li>Agregar una sobrecarga <code>avanzar(int gradosRueda, int velocidad)</code> que cambie la velocidad antes de avanzar.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="menu">
+  <div class="num">07</div>
+  <div class="content">
+    <h2>Programa con menú</h2>
+
+<p>Un programa puede ofrecer varias funciones y dejar elegir con los botones. Cada modo se escribe como un método <code>static</code> propio, y el <code>main</code> solo muestra el menú y llama al método elegido. Usa la clase auxiliar <code>Robot</code> del tema anterior, que tiene que estar en <code>src</code>.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/MenuRobot.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.<span class="ty">Button</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">MenuRobot</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">Robot</span>.velocidad(<span class="nu">300</span>);
+        <span class="kw">int</span> boton = <span class="nu">0</span>;
+
+        <span class="kw">while</span> (boton != <span class="ty">Button</span>.<span class="ty">ID_ESCAPE</span>) {
+            <span class="ty">Robot</span>.pantalla(<span class="st">"MENU"</span>, <span class="st">"ENTER: explorar"</span>, <span class="st">"&lt;    : bailar"</span>, <span class="st">"&gt;    : musica"</span>);
+            boton = <span class="ty">Button</span>.waitForAnyPress();
+
+            <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_ENTER</span>) {
+                explorar();
+            } <span class="kw">else</span> <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_LEFT</span>) {
+                bailar();
+            } <span class="kw">else</span> <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_RIGHT</span>) {
+                musica();
+            }
+        }
+        <span class="ty">Robot</span>.pantalla(<span class="st">"Hasta luego!"</span>, <span class="st">""</span>, <span class="st">""</span>, <span class="st">""</span>);
+        <span class="ty">Robot</span>.esperar(<span class="nu">2</span>);
+    }
+
+    <span class="kw">static</span> <span class="kw">void</span> explorar() {
+        <span class="kw">for</span> (<span class="kw">int</span> tramo = <span class="nu">1</span>; tramo &lt;= <span class="nu">4</span>; tramo++) {
+            <span class="ty">Robot</span>.pantalla(<span class="st">"Explorando"</span>, <span class="st">"Tramo "</span> + tramo, <span class="st">""</span>, <span class="st">""</span>);
+            <span class="ty">Robot</span>.avanzar(<span class="nu">720</span>);
+            <span class="ty">Robot</span>.girarDerecha(<span class="nu">180</span>);
+        }
+    }
+
+    <span class="kw">static</span> <span class="kw">void</span> bailar() {
+        <span class="ty">Robot</span>.pantalla(<span class="st">"Bailando"</span>, <span class="st">""</span>, <span class="st">""</span>, <span class="st">""</span>);
+        <span class="kw">for</span> (<span class="kw">int</span> paso = <span class="nu">0</span>; paso &lt; <span class="nu">8</span>; paso++) {
+            <span class="kw">if</span> (paso % <span class="nu">2</span> == <span class="nu">0</span>) {
+                <span class="ty">Robot</span>.girarDerecha(<span class="nu">90</span>);
+                <span class="ty">Robot</span>.tono(<span class="nu">440</span>, <span class="nu">200</span>);
+            } <span class="kw">else</span> {
+                <span class="ty">Robot</span>.girarIzquierda(<span class="nu">90</span>);
+                <span class="ty">Robot</span>.tono(<span class="nu">554</span>, <span class="nu">200</span>);
+            }
+        }
+    }
+
+    <span class="kw">static</span> <span class="kw">void</span> musica() {
+        <span class="ty">Robot</span>.pantalla(<span class="st">"Musica"</span>, <span class="st">""</span>, <span class="st">""</span>, <span class="st">""</span>);
+        <span class="kw">int</span>[] melodia = {<span class="nu">262</span>, <span class="nu">294</span>, <span class="nu">330</span>, <span class="nu">349</span>, <span class="nu">392</span>, <span class="nu">349</span>, <span class="nu">330</span>, <span class="nu">294</span>, <span class="nu">262</span>};
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nu">0</span>; i &lt; melodia.length; i++) {
+            <span class="ty">Robot</span>.tono(melodia[i], <span class="nu">300</span>);
+        }
+    }
+}</pre>
+</div>
+
+<p>Dividir el programa en métodos con nombres claros hace que el <code>main</code> se lea casi como una descripción en palabras de lo que hace el robot.</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Los cuatro botones ya están en uso. Proponer otra forma de elegir entre más de tres modos (pista: un número de modo que cambia con LEFT y RIGHT, como en el piano, y ENTER para ejecutarlo).</li><li>Hacer que <code>explorar()</code> se interrumpa si el sensor de contacto se presiona.</li><li>Crear un modo "patrulla" que vaya y vuelva 3 veces entre dos puntos.</li></ol></div>
   </div>
 </div>
 
 
 <div class="step" id="pilot">
-  <div class="num">05</div>
+  <div class="num">08</div>
   <div class="content">
     <h2>Navegación con DifferentialPilot</h2>
 
@@ -504,7 +687,7 @@
 <h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Sensores</h3>
 
 <div class="step" id="sensores">
-  <div class="num">06</div>
+  <div class="num">09</div>
   <div class="content">
     <h2>Sensores: contacto y ultrasónico</h2>
 
@@ -565,7 +748,7 @@
 
 
 <div class="step" id="luz">
-  <div class="num">07</div>
+  <div class="num">10</div>
   <div class="content">
     <h2>Sensor de luz y seguidor de línea</h2>
 
@@ -628,7 +811,7 @@
 <h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Programación avanzada</h3>
 
 <div class="step" id="comportamientos">
-  <div class="num">08</div>
+  <div class="num">11</div>
   <div class="content">
     <h2>Comportamientos (Behavior y Arbitrator)</h2>
 
@@ -736,7 +919,7 @@
 <h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Proyectos</h3>
 
 <div class="step" id="proyectos">
-  <div class="num">09</div>
+  <div class="num">12</div>
   <div class="content">
     <h2>Proyectos sugeridos</h2>
 
@@ -752,6 +935,7 @@
 <p>Para consultar todos los métodos disponibles: la documentación de la API instalada con leJOS, en <code>C:\Program Files (x86)\leJOS NXJ\docs</code>, y los ejemplos en la carpeta <code>samples</code>.</p>
   </div>
 </div>
+
 
 
 <footer>Material-Robotica · Prof. Elizabeth Izquierdo · LEGO NXT + leJOS NXJ 0.9.1</footer>

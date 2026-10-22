@@ -222,6 +222,7 @@
 
 <div class="panel">
   <p class="panel-title">Qué se necesita</p>
+  <p>Esta guía es para Windows. Para computadoras con Ubuntu, ver <a href="GuiaNXT-lejos-linux.html">Programar el NXT en Java desde Linux</a>.</p>
   <ul>
     <li>Un LEGO NXT con pilas o batería bien cargadas.</li>
     <li>Los instaladores del JDK 8 de 32 bits y de leJOS NXJ, disponibles en el release <a href="https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt"><code>instaladores-nxt</code></a> del repositorio NXT-java.</li>
@@ -427,7 +428,7 @@ nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
     <span class="badge warn">Si el USB no funciona</span>
     <p>Si al ejecutar <code>nxjflashg</code> aparece el error <code>cannot load library ... jfantom.dll</code>, Windows 11 está bloqueando el driver Fantom (ver la sección «Usar USB en lugar de Bluetooth»). Como el firmware se instala una sola vez por brick, las opciones son:</p>
     <ul>
-      <li>Hacer la instalación en otra computadora donde el USB del NXT funcione (por ejemplo, con Windows 10) y después volver a la Ceibalita para programar por Bluetooth.</li>
+      <li>Hacer la instalación en otra computadora donde el USB del NXT funcione y después volver a la Ceibalita para programar por Bluetooth. Una computadora con <strong>Ubuntu</strong> es una buena opción: ver la guía <a href="GuiaNXT-lejos-linux.html">Programar el NXT en Java desde Linux</a>.</li>
       <li>Desactivar temporalmente la <strong>Integridad de memoria</strong> (Seguridad de Windows → Seguridad del dispositivo → Aislamiento del núcleo), reiniciar, instalar el firmware y <strong>volver a activarla</strong> al terminar, con otro reinicio.</li>
     </ul>
 

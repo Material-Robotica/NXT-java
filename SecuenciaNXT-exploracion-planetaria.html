@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secuencia didáctica: misión de exploración planetaria (NXT + Java)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #f6f7fa;
+    --panel: #ffffff;
+    --panel-2: #f0f2f6;
+    --border: #dfe2ea;
+    --text: #1d2030;
+    --muted: #5b6075;
+    --accent: #d9640b;              /* naranja, como el botón ENTER del NXT */
+    --accent-soft: rgba(217,100,11,.10);
+    --green: #1f8a4c;
+    --green-soft: rgba(31,138,76,.10);
+    --blue: #2f5fd0;
+    --blue-soft: rgba(47,95,208,.10);
+    --code-bg: #f3f4f8;
+    --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    --sans: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height:1.55;
+    padding: 48px 20px 80px;
+  }
+  .wrap{ max-width: 780px; margin: 0 auto; }
+
+  header{ margin-bottom: 40px; }
+  .eyebrow{
+    font-family: var(--mono); font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent);
+    display:flex; align-items:center; gap:10px; margin-bottom: 14px;
+  }
+  .eyebrow::before{
+    content:""; width:8px; height:8px; border-radius:50%;
+    background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  h1{
+    font-family: var(--mono); font-weight:800;
+    font-size: clamp(25px, 4vw, 33px); line-height:1.15;
+    margin: 0 0 10px; letter-spacing: -0.01em;
+  }
+  h1 span{ color: var(--accent); }
+  .subtitle{ color: var(--muted); font-size: 15px; max-width: 60ch; margin:0; }
+
+  .section-title{
+    font-family: var(--mono); font-size: 13px; letter-spacing:.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin: 44px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+
+  .step{
+    position: relative; display:grid; grid-template-columns: 56px 1fr;
+    gap: 18px; padding-bottom: 34px;
+  }
+  .step:not(:last-child)::before{
+    content:""; position:absolute; left:27px; top:56px; bottom:0; width:2px;
+    background: linear-gradient(var(--border), transparent);
+  }
+  .num{
+    width:56px; height:56px; border-radius:14px;
+    background: var(--panel); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--mono); font-weight:700; font-size:18px; color: var(--accent);
+  }
+  .content{ padding-top:6px; min-width:0; }
+  .content h2{ font-family: var(--mono); font-size: 16px; font-weight:700; margin: 0 0 8px; }
+  .content p, .content ul, .content ol{ margin: 0 0 12px; color: var(--muted); font-size: 14.5px; }
+  .content ul, .content ol{ padding-left: 20px; }
+  .content li{ margin-bottom: 4px; }
+  .content strong{ color: var(--text); }
+
+  code{
+    font-family: var(--mono); background: var(--panel-2);
+    padding: 2px 6px; border-radius: 5px; font-size: 12.5px; color: var(--text);
+  }
+  a{ color: var(--blue); }
+
+  .term{
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; overflow:hidden; margin: 10px 0 14px;
+  }
+  .term-bar{
+    display:flex; align-items:center; gap:6px; padding: 7px 12px;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .term-bar span.dot{ width:9px; height:9px; border-radius:50%; background: #c9cdd8; }
+  .term-bar .label{
+    margin-left: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+  }
+  .term-bar button{
+    margin-left:auto; font-family: var(--mono); font-size: 11px;
+    border:1px solid var(--border); background: var(--bg); color: var(--muted);
+    border-radius:6px; padding:3px 9px; cursor:pointer;
+  }
+  .term-bar button:hover{ color: var(--accent); border-color: var(--accent); }
+  .term pre{
+    margin:0; padding: 14px 16px; font-family: var(--mono); font-size: 12.8px;
+    color: var(--text); overflow-x:auto; line-height:1.5;
+  }
+  .kw{ color:#a12a8a; font-weight:600; }
+  .ty{ color:#2f5fd0; }
+  .st{ color:#1f8a4c; }
+  .cm{ color:#8a8fa3; font-style: italic; }
+  .nu{ color:#c4570a; }
+
+  .badge{
+    display:inline-flex; align-items:center; font-family: var(--mono);
+    font-size: 11px; font-weight:600; letter-spacing:.04em;
+    padding: 3px 9px; border-radius:999px; margin-bottom:10px; text-transform: uppercase;
+  }
+  .badge.opt{ background: var(--blue-soft); color: var(--blue); }
+  .badge.warn{ background: var(--accent-soft); color: var(--accent); }
+  .badge.ok{ background: var(--green-soft); color: var(--green); }
+
+  .panel{
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px; margin: 10px 0 14px;
+  }
+  .panel p:last-child, .panel ul:last-child{ margin-bottom:0; }
+  .panel-title{ font-family: var(--mono); font-size: 13px; font-weight:700; margin: 0 0 6px; }
+
+  .tree{ font-family: var(--mono); font-size: 12.8px; color: var(--text); white-space: pre; overflow-x:auto; }
+
+  table{ width:100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 14px; }
+  th, td{ text-align:left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th{ font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight:600; }
+  td code{ white-space: nowrap; }
+  .table-wrap{ overflow-x:auto; }
+
+  .note{
+    border-radius: 12px; padding: 16px 18px; background: var(--accent-soft);
+    border: 1px solid rgba(217,100,11,.30); margin-top: 18px;
+  }
+  .note h2{ font-family: var(--mono); font-size: 15px; margin: 0 0 10px; }
+  .note dl{ margin:0; }
+  .note dt{ font-family: var(--mono); font-size: 13px; font-weight:700; margin-top: 12px; }
+  .note dd{ margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+  .check{ list-style:none; padding-left:0 !important; margin:0; }
+  .check li{ margin-bottom:6px; color: var(--muted); font-size:14.5px; }
+  .check input{ accent-color: var(--accent); margin-right:8px; }
+  .toc{ margin-bottom: 8px; }
+  .toc-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 24px; }
+  .toc-sec{ font-family: var(--mono); font-size: 11.5px; letter-spacing:.08em; text-transform: uppercase; color: var(--accent); margin: 10px 0 4px; }
+  .toc ol, .toc ul{ margin: 0 0 6px; padding-left: 22px; font-size: 14px; }
+  .toc li{ margin-bottom: 3px; color: var(--muted); }
+  .toc a{ color: var(--text); text-decoration: none; }
+  .toc a:hover{ color: var(--accent); text-decoration: underline; }
+  .section-title .top{ float:right; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--muted); text-decoration:none; }
+  .section-title .top:hover{ color: var(--accent); }
+  html{ scroll-behavior: smooth; }
+  [id]{ scroll-margin-top: 16px; }
+  @media print{ .section-title .top{ display:none; } }
+  .ej{ padding: 10px 14px; background: var(--panel); border-radius: 0 10px 10px 0; margin: 12px 0 14px; border:1px solid var(--border); border-left:3px solid var(--accent); }
+  .ej p.panel-title{ color: var(--accent); }
+  .ej ol, .ej ul{ margin-bottom:0; }
+  .meta{ display:flex; flex-wrap:wrap; gap:8px; margin: 0 0 12px; }
+  .meta span{ font-family: var(--mono); font-size: 11.5px; background: var(--panel-2); border:1px solid var(--border); border-radius: 999px; padding: 3px 10px; color: var(--muted); }
+  footer{
+    margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--border);
+    text-align:center; font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+
+  @media (max-width: 560px){
+    .step{ grid-template-columns: 1fr; gap: 10px; }
+    .step::before{ display:none; }
+    .num{ width:44px; height:44px; font-size:16px; }
+  }
+  @media print{
+    body{ background:#fff; padding: 0; }
+    .term-bar button{ display:none; }
+    .step, .panel, .term, .note{ break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Secuencia didáctica · LEGO NXT · Java</div>
+  <h1>Misión de <span>exploración planetaria</span></h1>
+  <p class="subtitle">Secuencia de 10 clases para aprender a programar el LEGO NXT en Java con leJOS, organizada como una misión espacial.</p>
+</header>
+
+<nav class="toc panel" id="indice">
+  <p class="panel-title">Índice</p>
+  <div class="toc-grid">
+    <div><p class="toc-sec">Preparación</p><ol>
+      <li value="1"><a href="#clase-1">Clase 1 · Presentación de la misión</a></li>
+      <li value="2"><a href="#clase-2">Clase 2 · Primer contacto con la nave</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Exploración</p><ol>
+      <li value="3"><a href="#clase-3">Clase 3 · Fundamentos del robot explorador</a></li>
+      <li value="4"><a href="#clase-4">Clase 4 · ¿Cuántos lados tiene?</a></li>
+      <li value="5"><a href="#clase-5">Clase 5 · ¡Ayuda, estoy atascado!</a></li>
+      <li value="6"><a href="#clase-6">Clase 6 · ¡Vamos a prospectar!</a></li>
+      <li value="7"><a href="#clase-7">Clase 7 · Medir el terreno</a></li>
+      <li value="8"><a href="#clase-8">Clase 8 · Preparar la zona de aterrizaje</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Proyecto final</p><ol>
+      <li value="9"><a href="#clase-9-10">Clases 9 y 10 · Proyecto final</a></li>
+    </ol></div>
+  </div>
+</nav>
+
+<div class="panel">
+  <p class="panel-title">Información general</p>
+  <div class="table-wrap"><table>
+    <tr><td><strong>Duración</strong></td><td>10 clases de 45 minutos.</td></tr>
+    <tr><td><strong>Destinatarios</strong></td><td>Bachillerato Tecnológico (también adaptable a otros cursos con nociones básicas de programación).</td></tr>
+    <tr><td><strong>Lenguaje y equipo</strong></td><td>Java con leJOS NXJ 0.9.1, LEGO MINDSTORMS NXT, VS Code.</td></tr>
+    <tr><td><strong>Requisito previo</strong></td><td>Entorno instalado según la guía <a href="GuiaNXT-lejos-vscode.html">Programar el NXT en Java con leJOS y VS Code</a>.</td></tr>
+    <tr><td><strong>Material de consulta</strong></td><td>Cada clase indica el tema correspondiente de la guía <a href="GuiaNXT-java-primeros-pasos.html">Programar el NXT en Java: primeros pasos</a>.</td></tr>
+    <tr><td><strong>Conexiones</strong></td><td>Ruedas en B (izquierda) y C (derecha); pinza en A; contacto en 1, luz en 3, ultrasónico en 4.</td></tr>
+  </table></div>
+  <p>Hilo conductor: una <strong>misión de exploración planetaria</strong>. Cada clase es una etapa de la misión, con un objetivo de programación, un programa base y desafíos para los equipos que terminan antes.</p>
+</div>
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Preparación</h3>
+
+<div class="step" id="clase-1">
+  <div class="num">01</div>
+  <div class="content">
+    <h2>Clase 1 · Presentación de la misión</h2>
+<div class="meta"><span>45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#partes">Partes del NXT</a></span></div>
+
+<p><strong>Objetivos:</strong> presentar la misión, reconocer las partes del NXT y acordar las reglas de cuidado del equipo.</p>
+<p><strong>La misión.</strong> El grupo forma parte de una agencia espacial que envió un robot explorador a un planeta lejano. Desde la Tierra solo se le pueden enviar programas: el robot tiene que moverse, esquivar obstáculos, analizar el terreno y preparar la zona de aterrizaje de la próxima nave. Cada clase es una etapa de la misión.</p>
+<div class="ej"><p class="panel-title">Actividades</p><ol><li>Presentar la misión y formar los equipos (roles sugeridos: programador/a, constructor/a, responsable del registro).</li><li>Recorrer las partes del ladrillo, los motores y los sensores con la tabla del tema <a href="GuiaNXT-java-primeros-pasos.html#partes">Partes del NXT</a>.</li><li>Armar o revisar el robot base: motor izquierdo en <strong>B</strong>, derecho en <strong>C</strong>.</li><li>Completar una tabla con lo que hay conectado en cada puerto.</li></ol></div>
+
+<span class="badge warn">Regla número uno</span>
+<p><strong>Cuidar los robots.</strong> Probar siempre dentro del área de pruebas, nunca sobre mesas sin borde, y apagar el ladrillo al terminar.</p>
+  </div>
+</div>
+
+
+<div class="step" id="clase-2">
+  <div class="num">02</div>
+  <div class="content">
+    <h2>Clase 2 · Primer contacto con la nave</h2>
+<div class="meta"><span>45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#estructura">Estructura</a>, <a href="GuiaNXT-java-primeros-pasos.html#motores">Motores</a></span></div>
+
+<p><strong>Objetivos:</strong> comprender la estructura de un programa Java para el NXT, subirlo con Ctrl + Shift + B y mover los motores por tiempo.</p>
+<p><strong>Misión:</strong> la base envía el primer mensaje al robot y lo hace avanzar en línea recta para comprobar que los motores funcionan.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/MovimientoRecto.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+<span class="kw">import</span> lejos.util.<span class="ty">Delay</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">MovimientoRecto</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">LCD</span>.drawString(<span class="st">"Mision iniciada"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+        <span class="ty">Button</span>.waitForAnyPress();
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.setSpeed(<span class="nu">300</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.setSpeed(<span class="nu">300</span>);
+        <span class="ty">Motor</span>.<span class="ty">B</span>.forward();
+        <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+
+        <span class="ty">Delay</span>.msDelay(<span class="nu">3000</span>);
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+        <span class="ty">LCD</span>.drawString(<span class="st">"Prueba completa"</span>, <span class="nu">0</span>, <span class="nu">2</span>);
+        <span class="ty">Button</span>.waitForAnyPress();
+    }
+}</pre>
+</div>
+<div class="ej"><p class="panel-title">Desafíos</p><ol><li>Cambiar la velocidad y el tiempo para que el robot recorra exactamente 1 metro. Anotar los valores.</li><li>Hacer que avance, se detenga 1 segundo y retroceda a la posición inicial.</li></ol></div>
+  </div>
+</div>
+
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Exploración</h3>
+
+<div class="step" id="clase-3">
+  <div class="num">03</div>
+  <div class="content">
+    <h2>Clase 3 · Fundamentos del robot explorador</h2>
+<div class="meta"><span>45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#motores">Motores</a>, <a href="GuiaNXT-java-primeros-pasos.html#clase-auxiliar">Clase auxiliar</a></span></div>
+
+<p><strong>Objetivos:</strong> usar <code>rotate()</code> para movimientos precisos, calibrar el giro de 90° y usar la clase auxiliar <code>Robot</code>.</p>
+<p><strong>Misión:</strong> recorrer un circuito marcado en el piso (por ejemplo, una "L" o una "U" de cinta) sin salirse.</p>
+<p>Primero se calibra: probar valores en <code>girarDerecha()</code> hasta que el robot gire exactamente 90° y guardarlo en una constante. La palabra <code>final</code> indica que su valor no cambia.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/RecorridoExplorador.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">public</span> <span class="kw">class</span> <span class="ty">RecorridoExplorador</span> {
+    <span class="cm">// grados de rueda para girar 90 grados: medir y ajustar en cada robot</span>
+    <span class="kw">static</span> <span class="kw">final</span> <span class="kw">int</span> <span class="ty">GIRO_90</span> = <span class="nu">180</span>;
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">Robot</span>.mostrar(<span class="st">"Circuito"</span>, <span class="nu">0</span>);
+        <span class="ty">Robot</span>.esperarBoton();
+        <span class="ty">Robot</span>.velocidad(<span class="nu">300</span>);
+
+        <span class="ty">Robot</span>.avanzar(<span class="nu">1080</span>);
+        <span class="ty">Robot</span>.girarDerecha(<span class="ty">GIRO_90</span>);
+        <span class="ty">Robot</span>.avanzar(<span class="nu">720</span>);
+        <span class="ty">Robot</span>.girarIzquierda(<span class="ty">GIRO_90</span>);
+        <span class="ty">Robot</span>.avanzar(<span class="nu">1080</span>);
+
+        <span class="ty">Robot</span>.mostrar(<span class="st">"Llegada!"</span>, <span class="nu">2</span>);
+        <span class="ty">Robot</span>.esperarBoton();
+    }
+}</pre>
+</div>
+<p>Requiere <code>Robot.java</code> en la carpeta <code>src</code> (ver el tema <a href="GuiaNXT-java-primeros-pasos.html#clase-auxiliar">Clase auxiliar</a>).</p>
+<div class="ej"><p class="panel-title">Desafíos</p><ol><li>Calcular cuántos grados de rueda corresponden a 10 cm de avance (pista: medir cuánto avanza el robot con 360°).</li><li>Diseñar un circuito propio, dibujarlo en papel con medidas y programarlo.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="clase-4">
+  <div class="num">04</div>
+  <div class="content">
+    <h2>Clase 4 · ¿Cuántos lados tiene?</h2>
+<div class="meta"><span>45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#clase-auxiliar">Clase auxiliar</a></span></div>
+
+<p><strong>Objetivos:</strong> usar <code>for</code> y métodos con parámetros para dibujar polígonos regulares; relacionar con el ángulo exterior (360° / cantidad de lados).</p>
+<p><strong>Misión:</strong> el robot marca en el suelo las zonas de exploración con figuras geométricas. Se sujeta un marcador al robot, en el centro entre las ruedas.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/DibujarFormas.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.<span class="ty">Button</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">DibujarFormas</span> {
+    <span class="kw">static</span> <span class="kw">final</span> <span class="kw">int</span> <span class="ty">GIRO_90</span> = <span class="nu">180</span>;   <span class="cm">// el valor calibrado en la clase 3</span>
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">Robot</span>.velocidad(<span class="nu">250</span>);
+
+        <span class="ty">Robot</span>.pantalla(<span class="st">"ENTER:"</span>, <span class="st">"triangulo"</span>, <span class="st">""</span>, <span class="st">""</span>);
+        <span class="ty">Button</span>.<span class="ty">ENTER</span>.waitForPressAndRelease();
+        poligono(<span class="nu">3</span>, <span class="nu">720</span>);
+
+        <span class="ty">Robot</span>.pantalla(<span class="st">"ENTER:"</span>, <span class="st">"cuadrado"</span>, <span class="st">""</span>, <span class="st">""</span>);
+        <span class="ty">Button</span>.<span class="ty">ENTER</span>.waitForPressAndRelease();
+        poligono(<span class="nu">4</span>, <span class="nu">720</span>);
+
+        <span class="ty">Robot</span>.pantalla(<span class="st">"Figuras listas"</span>, <span class="st">""</span>, <span class="st">""</span>, <span class="st">""</span>);
+        <span class="ty">Robot</span>.esperarBoton();
+    }
+
+    <span class="cm">// lados: cantidad de lados; largo: grados de rueda por lado</span>
+    <span class="kw">static</span> <span class="kw">void</span> poligono(<span class="kw">int</span> lados, <span class="kw">int</span> largo) {
+        <span class="kw">int</span> anguloExterior = <span class="nu">360</span> / lados;
+        <span class="kw">int</span> giro = <span class="ty">GIRO_90</span> * anguloExterior / <span class="nu">90</span>;   <span class="cm">// regla de tres</span>
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nu">0</span>; i &lt; lados; i++) {
+            <span class="ty">Robot</span>.avanzar(largo);
+            <span class="ty">Robot</span>.girarDerecha(giro);
+        }
+    }
+}</pre>
+</div>
+<div class="ej"><p class="panel-title">Desafíos</p><ol><li>Dibujar un pentágono y un hexágono. ¿Qué pasa con la figura cuando los lados son muchos (por ejemplo, 36)?</li><li>Elegir la cantidad de lados con LEFT y RIGHT antes de dibujar.</li><li>Calcular a mano el ángulo exterior de cada figura y compararlo con lo que hace el robot.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="clase-5">
+  <div class="num">05</div>
+  <div class="content">
+    <h2>Clase 5 · ¡Ayuda, estoy atascado!</h2>
+<div class="meta"><span>45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#sensores">Sensores: contacto y ultrasónico</a></span></div>
+
+<p><strong>Objetivos:</strong> leer el sensor ultrasónico y tomar decisiones con <code>if</code> dentro de un <code>while</code>.</p>
+<p><strong>Misión:</strong> el terreno está lleno de rocas (cajas). El robot tiene que avanzar y, cuando detecte una roca a menos de 30 cm, girar para esquivarla. Sensor ultrasónico en el puerto 4.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/EvitarObstaculos.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+<span class="kw">import</span> lejos.util.<span class="ty">Delay</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">EvitarObstaculos</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">UltrasonicSensor</span> sonar = <span class="kw">new</span> <span class="ty">UltrasonicSensor</span>(<span class="ty">SensorPort</span>.<span class="ty">S4</span>);
+        <span class="ty">Motor</span>.<span class="ty">B</span>.setSpeed(<span class="nu">300</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.setSpeed(<span class="nu">300</span>);
+
+        <span class="kw">while</span> (!<span class="ty">Button</span>.<span class="ty">ESCAPE</span>.isDown()) {
+            <span class="kw">int</span> distancia = sonar.getDistance();
+            <span class="ty">LCD</span>.clear();
+            <span class="ty">LCD</span>.drawString(<span class="st">"Dist: "</span> + distancia, <span class="nu">0</span>, <span class="nu">0</span>);
+
+            <span class="kw">if</span> (distancia &gt; <span class="nu">30</span>) {
+                <span class="ty">Motor</span>.<span class="ty">B</span>.forward();          <span class="cm">// camino libre</span>
+                <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+            } <span class="kw">else</span> {
+                <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);         <span class="cm">// roca: frenar y girar</span>
+                <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+                <span class="ty">Sound</span>.beep();
+                <span class="ty">Motor</span>.<span class="ty">B</span>.rotate(<span class="nu">180</span>, <span class="kw">true</span>);
+                <span class="ty">Motor</span>.<span class="ty">C</span>.rotate(-<span class="nu">180</span>);
+            }
+            <span class="ty">Delay</span>.msDelay(<span class="nu">100</span>);
+        }
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+    }
+}</pre>
+</div>
+<div class="ej"><p class="panel-title">Desafíos</p><ol><li>Girar hacia un lado al azar: <code>new java.util.Random().nextInt(2)</code> devuelve 0 o 1.</li><li>Agregar el sensor de contacto como respaldo, para las rocas que el ultrasónico no ve (muy bajas o muy angostas).</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="clase-6">
+  <div class="num">06</div>
+  <div class="content">
+    <h2>Clase 6 · ¡Vamos a prospectar!</h2>
+<div class="meta"><span>45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#luz">Sensor de luz</a></span></div>
+
+<p><strong>Objetivos:</strong> medir y calibrar el sensor de luz, y clasificar superficies con <code>if / else if / else</code>.</p>
+<p><strong>Misión:</strong> el suelo del planeta tiene minerales raros: zonas negras y zonas blancas sobre un fondo gris. El robot recorre el terreno y se detiene a "analizar" cada mineral que encuentra. Sensor de luz en el puerto 3, mirando al piso.</p>
+<p>Antes de programar, medir con <code>MedirLuz</code> (tema '+ref('luz','Sensor de luz')+') los valores del negro, el gris y el blanco, y ajustar los límites.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Prospector.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+<span class="kw">import</span> lejos.util.<span class="ty">Delay</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">Prospector</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">LightSensor</span> luz = <span class="kw">new</span> <span class="ty">LightSensor</span>(<span class="ty">SensorPort</span>.<span class="ty">S3</span>);
+        <span class="kw">int</span> limiteNegro = <span class="nu">30</span>;    <span class="cm">// ajustar con los valores medidos</span>
+        <span class="kw">int</span> limiteBlanco = <span class="nu">55</span>;
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.setSpeed(<span class="nu">200</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.setSpeed(<span class="nu">200</span>);
+
+        <span class="kw">while</span> (!<span class="ty">Button</span>.<span class="ty">ESCAPE</span>.isDown()) {
+            <span class="kw">int</span> valor = luz.getLightValue();
+            <span class="ty">LCD</span>.clear();
+            <span class="ty">LCD</span>.drawString(<span class="st">"Luz: "</span> + valor, <span class="nu">0</span>, <span class="nu">0</span>);
+
+            <span class="kw">if</span> (valor &lt; limiteNegro) {
+                <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+                <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+                <span class="ty">LCD</span>.drawString(<span class="st">"MINERAL NEGRO"</span>, <span class="nu">0</span>, <span class="nu">2</span>);
+                <span class="ty">Sound</span>.twoBeeps();
+                <span class="ty">Delay</span>.msDelay(<span class="nu">2000</span>);
+                <span class="ty">Motor</span>.<span class="ty">B</span>.rotate(<span class="nu">360</span>, <span class="kw">true</span>);   <span class="cm">// salir del mineral</span>
+                <span class="ty">Motor</span>.<span class="ty">C</span>.rotate(<span class="nu">360</span>);
+            } <span class="kw">else</span> <span class="kw">if</span> (valor &gt; limiteBlanco) {
+                <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+                <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+                <span class="ty">LCD</span>.drawString(<span class="st">"MINERAL BLANCO"</span>, <span class="nu">0</span>, <span class="nu">2</span>);
+                <span class="ty">Sound</span>.beepSequence();
+                <span class="ty">Delay</span>.msDelay(<span class="nu">2000</span>);
+                <span class="ty">Motor</span>.<span class="ty">B</span>.rotate(<span class="nu">360</span>, <span class="kw">true</span>);
+                <span class="ty">Motor</span>.<span class="ty">C</span>.rotate(<span class="nu">360</span>);
+            } <span class="kw">else</span> {
+                <span class="ty">Motor</span>.<span class="ty">B</span>.forward();           <span class="cm">// terreno comun</span>
+                <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+            }
+            <span class="ty">Delay</span>.msDelay(<span class="nu">50</span>);
+        }
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+    }
+}</pre>
+</div>
+<div class="ej"><p class="panel-title">Desafíos</p><ol><li>Contar cuántos minerales de cada tipo encontró y mostrarlo al terminar.</li><li>Si el kit tiene sensor de color, detectar minerales de colores con <code>ColorSensor</code> y <code>getColorID()</code>.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="clase-7">
+  <div class="num">07</div>
+  <div class="content">
+    <h2>Clase 7 · Medir el terreno</h2>
+<div class="meta"><span>45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#motores">Motores</a>, <a href="GuiaNXT-java-primeros-pasos.html#sensores">Sensores</a></span></div>
+
+<p><strong>Objetivos:</strong> usar el sensor de rotación del motor (<code>getTachoCount()</code>) y convertir grados de rueda en centímetros.</p>
+<p><strong>Misión:</strong> antes del aterrizaje hay que medir el largo de la pista. El robot avanza desde el inicio hasta tocar la pared del fondo (sensor de contacto en el puerto 1) e informa la distancia recorrida.</p>
+<p>En una vuelta completa (360°) la rueda avanza lo que mide su circunferencia: π × diámetro. Por eso: <code>cm = grados / 360 × π × diámetro</code>.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/MedirPista.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">MedirPista</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">TouchSensor</span> tacto = <span class="kw">new</span> <span class="ty">TouchSensor</span>(<span class="ty">SensorPort</span>.<span class="ty">S1</span>);
+        <span class="kw">double</span> diametro = <span class="nu">5.6</span>;   <span class="cm">// diametro de la rueda en cm (medir)</span>
+
+        <span class="ty">LCD</span>.drawString(<span class="st">"Medir pista"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+        <span class="ty">Button</span>.waitForAnyPress();
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.resetTachoCount();
+        <span class="ty">Motor</span>.<span class="ty">B</span>.setSpeed(<span class="nu">250</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.setSpeed(<span class="nu">250</span>);
+        <span class="ty">Motor</span>.<span class="ty">B</span>.forward();
+        <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+
+        <span class="kw">while</span> (!tacto.isPressed()) {
+            <span class="cm">// avanzar hasta tocar la pared</span>
+        }
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+
+        <span class="kw">int</span> grados = <span class="ty">Motor</span>.<span class="ty">B</span>.getTachoCount();
+        <span class="kw">double</span> cm = grados / <span class="nu">360.0</span> * <span class="ty">Math</span>.<span class="ty">PI</span> * diametro;
+
+        <span class="ty">LCD</span>.clear();
+        <span class="ty">LCD</span>.drawString(<span class="st">"Grados: "</span> + grados, <span class="nu">0</span>, <span class="nu">0</span>);
+        <span class="ty">LCD</span>.drawString(<span class="st">"Cm: "</span> + (<span class="kw">int</span>) cm, <span class="nu">0</span>, <span class="nu">2</span>);
+        <span class="ty">Sound</span>.beep();
+        <span class="ty">Button</span>.waitForAnyPress();
+    }
+}</pre>
+</div>
+<div class="ej"><p class="panel-title">Desafíos</p><ol><li>Medir la pista con una cinta métrica y comparar. ¿De dónde puede venir la diferencia?</li><li>Después de medir, volver al punto de partida retrocediendo exactamente los mismos grados.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="clase-8">
+  <div class="num">08</div>
+  <div class="content">
+    <h2>Clase 8 · Preparar la zona de aterrizaje</h2>
+<div class="meta"><span>45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#brick">Pantalla, botones y sonido</a></span></div>
+
+<p><strong>Objetivos:</strong> controlar un tercer motor (pinza o brazo) con los botones y combinarlo con el movimiento.</p>
+<p><strong>Misión:</strong> hay que despejar la zona de aterrizaje moviendo rocas pequeñas fuera de un círculo marcado. Se agrega al robot una pinza o brazo con un motor en el puerto <strong>A</strong> (B y C siguen siendo las ruedas).</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Pinza.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">Pinza</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">Motor</span>.<span class="ty">A</span>.setSpeed(<span class="nu">100</span>);
+        <span class="kw">int</span> boton = <span class="nu">0</span>;
+
+        <span class="kw">while</span> (boton != <span class="ty">Button</span>.<span class="ty">ID_ESCAPE</span>) {
+            <span class="ty">LCD</span>.clear();
+            <span class="ty">LCD</span>.drawString(<span class="st">"Control pinza"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+            <span class="ty">LCD</span>.drawString(<span class="st">"ENTER: cerrar"</span>, <span class="nu">0</span>, <span class="nu">2</span>);
+            <span class="ty">LCD</span>.drawString(<span class="st">"&lt;    : abrir"</span>, <span class="nu">0</span>, <span class="nu">3</span>);
+            <span class="ty">LCD</span>.drawString(<span class="st">"&gt;    : avanzar"</span>, <span class="nu">0</span>, <span class="nu">4</span>);
+            <span class="ty">LCD</span>.drawString(<span class="st">"ESC  : salir"</span>, <span class="nu">0</span>, <span class="nu">6</span>);
+
+            boton = <span class="ty">Button</span>.waitForAnyPress();
+            <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_ENTER</span>) {
+                <span class="ty">Motor</span>.<span class="ty">A</span>.rotate(<span class="nu">90</span>);           <span class="cm">// cerrar (ajustar el angulo)</span>
+                <span class="ty">Sound</span>.beep();
+            } <span class="kw">else</span> <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_LEFT</span>) {
+                <span class="ty">Motor</span>.<span class="ty">A</span>.rotate(-<span class="nu">90</span>);          <span class="cm">// abrir</span>
+                <span class="ty">Sound</span>.twoBeeps();
+            } <span class="kw">else</span> <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_RIGHT</span>) {
+                <span class="ty">Motor</span>.<span class="ty">B</span>.rotate(<span class="nu">360</span>, <span class="kw">true</span>);    <span class="cm">// avanzar una vuelta</span>
+                <span class="ty">Motor</span>.<span class="ty">C</span>.rotate(<span class="nu">360</span>);
+            }
+        }
+    }
+}</pre>
+</div>
+<div class="ej"><p class="panel-title">Desafíos</p><ol><li>Ajustar el ángulo de la pinza para que agarre sin forzar el motor.</li><li>Programar una secuencia automática: avanzar hasta la roca (ultrasónico), cerrar la pinza, girar 180°, avanzar y soltar.</li></ol></div>
+  </div>
+</div>
+
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Proyecto final</h3>
+
+<div class="step" id="clase-9-10">
+  <div class="num">09</div>
+  <div class="content">
+    <h2>Clases 9 y 10 · Proyecto final</h2>
+<div class="meta"><span>2 × 45 min</span><span>Guía: <a href="GuiaNXT-java-primeros-pasos.html#proyectos">Proyectos sugeridos</a></span></div>
+
+<p><strong>Objetivo:</strong> diseñar, programar y presentar un desafío propio que integre motores, sensores y métodos.</p>
+<div class="ej"><p class="panel-title">Opciones de proyecto</p><ul><li><strong>Seguidor de línea</strong> que recorre una pista hasta la base (tema <a href="GuiaNXT-java-primeros-pasos.html#luz">Sensor de luz</a>).</li><li><strong>Sistema de alarma</strong> que vigila la nave con el ultrasónico y suena si algo se acerca.</li><li><strong>Robot bailarín</strong> con una coreografía y melodía programadas (arrays de notas y movimientos).</li><li><strong>Explorador autónomo completo</strong> con comportamientos (tema <a href="GuiaNXT-java-primeros-pasos.html#comportamientos">Comportamientos</a>).</li><li>Una propuesta propia del equipo, aprobada por la docente.</li></ul></div>
+
+<p><strong>Clase 9:</strong> elegir el proyecto, escribir en papel qué tiene que hacer el robot (pasos o diagrama), y empezar a programar a partir de la plantilla. <strong>Clase 10:</strong> terminar, probar y presentar (demostración de 3 minutos y explicación del código).</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/ProyectoFinal.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+<span class="kw">import</span> lejos.util.<span class="ty">Delay</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">ProyectoFinal</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">LCD</span>.drawString(<span class="st">"MI PROYECTO:"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+        <span class="ty">LCD</span>.drawString(<span class="st">"[nombre]"</span>, <span class="nu">0</span>, <span class="nu">1</span>);       <span class="cm">// hasta 16 caracteres</span>
+        <span class="ty">Button</span>.waitForAnyPress();
+
+        <span class="cm">// 1. Crear los sensores que se van a usar</span>
+
+        <span class="kw">while</span> (!<span class="ty">Button</span>.<span class="ty">ESCAPE</span>.isDown()) {
+            <span class="cm">// 2. Leer los sensores</span>
+            <span class="cm">// 3. Decidir y mover los motores</span>
+            <span class="ty">Delay</span>.msDelay(<span class="nu">50</span>);
+        }
+
+        <span class="cm">// 4. Detener todos los motores</span>
+        <span class="ty">Motor</span>.<span class="ty">A</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+    }
+}</pre>
+</div>
+
+<p><strong>Evaluación.</strong> Rúbrica sugerida para el proyecto final:</p>
+<div class="table-wrap"><table>
+<tr><th>Criterio</th><th>Excelente (4)</th><th>Bueno (3)</th><th>Satisfactorio (2)</th><th>En proceso (1)</th></tr>
+<tr><td><strong>Programación</strong></td><td>Código organizado en métodos, con nombres claros y comentarios; usa estructuras adecuadas.</td><td>Código funcional y en general ordenado.</td><td>Funciona en parte; código desordenado o repetitivo.</td><td>No logra un programa funcional sin ayuda.</td></tr>
+<tr><td><strong>Uso de sensores</strong></td><td>Calibra los sensores y el robot reacciona de forma confiable.</td><td>Usa sensores correctamente con fallas ocasionales.</td><td>Usa sensores con valores sin calibrar.</td><td>No integra sensores.</td></tr>
+<tr><td><strong>Resolución de problemas</strong></td><td>Prueba, detecta errores y los corrige de forma autónoma; registra los cambios.</td><td>Corrige errores con poca ayuda.</td><td>Necesita ayuda frecuente para avanzar.</td><td>No logra avanzar ante los errores.</td></tr>
+<tr><td><strong>Trabajo en equipo</strong></td><td>Roles claros y rotativos; todos participan y pueden explicar el código.</td><td>Participación equilibrada en general.</td><td>Participación desigual.</td><td>El trabajo depende de una sola persona.</td></tr>
+<tr><td><strong>Creatividad y presentación</strong></td><td>Propuesta original, bien explicada, con demostración exitosa.</td><td>Propuesta adecuada y demostración funcional.</td><td>Propuesta simple o demostración incompleta.</td><td>Sin presentación del proyecto.</td></tr>
+<tr><td><strong>Cuidado del equipo</strong></td><td>Siempre respeta el área de pruebas y deja el material ordenado.</td><td>Casi siempre.</td><td>Necesita recordatorios.</td><td>No respeta las reglas de cuidado.</td></tr>
+</table></div>
+  </div>
+</div>
+
+
+<div class="panel">
+  <p class="panel-title">Créditos</p>
+  <p>Secuencia adaptada para NXT y Java con leJOS NXJ a partir de una propuesta original para LEGO EV3: <a href="https://sites.google.com/site/gask3t/lego-ev3/ev3eeb3?authuser=0">sites.google.com/site/gask3t</a>.</p>
+</div>
+
+<footer>Material-Robotica · Prof. Elizabeth Izquierdo · Secuencia didáctica NXT + Java</footer>
+
+</div>
+<script>
+  document.querySelectorAll('.term').forEach(function (term) {
+    var btn = term.querySelector('button');
+    var pre = term.querySelector('pre');
+    if (!btn || !pre) return;
+    btn.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        btn.textContent = 'Copiado';
+        setTimeout(function () { btn.textContent = 'Copiar'; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {});
+      }
+    });
+  });
+</script>
+</body>
+</html>
