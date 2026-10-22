@@ -181,6 +181,7 @@
   <p class="panel-title">Qué se necesita</p>
   <ul>
     <li>Un LEGO NXT con pilas o batería bien cargadas.</li>
+    <li>Los instaladores del JDK 8 de 32 bits y de leJOS NXJ, disponibles en el release <a href="https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt"><code>instaladores-nxt</code></a> del repositorio NXT-java.</li>
     <li>Cable USB del NXT (solo para instalar el firmware leJOS, si el brick no lo tiene).</li>
     <li>Computadora con Windows 11 y <strong>Bluetooth</strong> (las Ceibalitas lo tienen), con permisos de administrador para instalar.</li>
     <li>VS Code con la extensión <strong>Extension Pack for Java</strong> (Microsoft).</li>
@@ -231,8 +232,9 @@ foreach ($base in $bases) {
   <div class="num">02</div>
   <div class="content">
     <h2>Instalar un JDK 8 de 32 bits</h2>
-    <p>Entrar a <a href="https://adoptium.net/temurin/releases/?version=8&amp;os=windows&amp;arch=x86">adoptium.net</a> y elegir versión <strong>8 - LTS</strong>, sistema <strong>Windows</strong> y arquitectura <strong>x86</strong>.</p>
-    <span class="badge warn">Aviso esperado</span>
+    <p>Descargar el instalador <code>.msi</code> del JDK 8 de 32 bits (Temurin) desde el release <a href="https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt"><code>instaladores-nxt</code> del repositorio Material-Robotica/NXT-java</a>, en la sección <strong>Assets</strong>.</p>
+    <span class="badge opt">Alternativa · sitio oficial</span>
+    <p>Si el release no está disponible, entrar a <a href="https://adoptium.net/temurin/releases/?version=8&amp;os=windows&amp;arch=x86">adoptium.net</a> y elegir versión <strong>8 - LTS</strong>, sistema <strong>Windows</strong> y arquitectura <strong>x86</strong>.</p>
     <p>La página muestra <strong>Unsupported Platform</strong>: Windows de 32 bits ya no recibe actualizaciones de seguridad. Para este uso el riesgo es muy bajo, porque ese JDK solo lo usan las herramientas de leJOS. Hacer clic en <strong>Show downloads anyway</strong>, dejar seleccionado <strong>JDK</strong> y descargar el <code>.msi</code>.</p>
     <p>En el instalador, cambiar la ubicación a:</p>
     <div class="term">
@@ -261,13 +263,14 @@ foreach ($base in $bases) {
   <div class="num">03</div>
   <div class="content">
     <h2>Instalar leJOS NXJ 0.9.1beta-3</h2>
-    <span class="badge warn">Cuidado al descargar</span>
-    <p>En SourceForge, el botón verde <strong>Download Latest Version</strong> descarga leJOS para <strong>EV3</strong>, que no sirve para el NXT. Usar este enlace directo:</p>
+    <p>Descargar <code>leJOS_NXJ_0.9.1beta-3_win32_setup.exe</code> desde el release <a href="https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt"><code>instaladores-nxt</code> del repositorio Material-Robotica/NXT-java</a>, en la sección <strong>Assets</strong>.</p>
+    <span class="badge opt">Alternativa · SourceForge</span>
+    <p>Si el release no está disponible, descargarlo de SourceForge con este enlace directo. Ahí el botón verde <strong>Download Latest Version</strong> descarga leJOS para <strong>EV3</strong>, que no sirve para el NXT.</p>
     <div class="term">
       <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">enlace de descarga</span><button type="button">Copiar</button></div>
       <pre>https://sourceforge.net/projects/lejos/files/lejos-NXJ/0.9.1beta/leJOS_NXJ_0.9.1beta-3_win32_setup.exe/download</pre>
     </div>
-    <p>Comprobar que el archivo descargado se llame <code>leJOS_NXJ_0.9.1beta-3_win32_setup.exe</code> y pese unos <strong>21 MB</strong> (el de EV3 pesa unos 27 MB). También se encuentra en el release <code>instaladores-nxt</code> del repositorio <a href="https://github.com/Material-Robotica/openRoberta-NXT/releases">Material-Robotica/openRoberta-NXT</a>.</p>
+    <p>Comprobar que el archivo descargado se llame <code>leJOS_NXJ_0.9.1beta-3_win32_setup.exe</code> y pese unos <strong>21 MB</strong> (el de EV3 pesa unos 27 MB).</p>
     <ol>
       <li>Ejecutar como administrador. Si aparece SmartScreen: <strong>Más información → Ejecutar de todas formas</strong>.</li>
       <li>En <strong>Select a Java Development Kit</strong>, seleccionar la carpeta <code>C:\Java\jdk8-32</code> (la carpeta raíz, no <code>bin</code>).</li>
