@@ -151,6 +151,18 @@
   .check{ list-style:none; padding-left:0 !important; margin:0; }
   .check li{ margin-bottom:6px; color: var(--muted); font-size:14.5px; }
   .check input{ accent-color: var(--accent); margin-right:8px; }
+  .toc{ margin-bottom: 8px; }
+  .toc-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 24px; }
+  .toc-sec{ font-family: var(--mono); font-size: 11.5px; letter-spacing:.08em; text-transform: uppercase; color: var(--accent); margin: 10px 0 4px; }
+  .toc ol, .toc ul{ margin: 0 0 6px; padding-left: 22px; font-size: 14px; }
+  .toc li{ margin-bottom: 3px; color: var(--muted); }
+  .toc a{ color: var(--text); text-decoration: none; }
+  .toc a:hover{ color: var(--accent); text-decoration: underline; }
+  .section-title .top{ float:right; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--muted); text-decoration:none; }
+  .section-title .top:hover{ color: var(--accent); }
+  html{ scroll-behavior: smooth; }
+  [id]{ scroll-margin-top: 16px; }
+  @media print{ .section-title .top{ display:none; } }
   footer{
     margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--border);
     text-align:center; font-family: var(--mono); font-size: 12px; color: var(--muted);
@@ -177,6 +189,38 @@
   <p class="subtitle">Instalación en Windows 11 (Ceibalita), conexión por Bluetooth, primer programa y herramientas útiles. Incluye cómo instalar el firmware leJOS en un NXT que todavía tiene el firmware de LEGO.</p>
 </header>
 
+<nav class="toc panel" id="indice">
+  <p class="panel-title">Índice</p>
+  <div class="toc-grid">
+    <div><p class="toc-sec">Instalación</p><ol>
+      <li value="1"><a href="#paso-1">Comprobar qué Java hay instalado</a></li>
+      <li value="2"><a href="#paso-2">Instalar un JDK 8 de 32 bits</a></li>
+      <li value="3"><a href="#paso-3">Instalar leJOS NXJ 0.9.1beta-3</a></li>
+      <li value="4"><a href="#paso-4">Verificar las variables de entorno</a></li>
+      <li value="5"><a href="#paso-5">Instalar VS Code y la extensión de Java</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Firmware leJOS en el NXT</p><ol>
+      <li value="6"><a href="#paso-6">Instalar leJOS en el NXT (si no lo tiene)</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Conexión por Bluetooth</p><ol>
+      <li value="7"><a href="#paso-7">Emparejar el NXT con la computadora</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Proyecto en VS Code</p><ol>
+      <li value="8"><a href="#paso-8">Crear el proyecto con un script</a></li>
+      <li value="9"><a href="#paso-9">Subir y ejecutar el primer programa</a></li>
+      <li value="10"><a href="#paso-10">Segundo programa: explorador con sensor ultrasónico</a></li>
+      <li value="11"><a href="#paso-11">Clase auxiliar con métodos propios</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Referencia y ayuda</p><ul>
+      <li><a href="#ref-clases">Clases más usadas</a></li>
+      <li><a href="#ref-herramientas">Herramientas de leJOS NXJ</a></li>
+      <li><a href="#usb">Usar USB en lugar de Bluetooth</a></li>
+      <li><a href="#problemas">Problemas frecuentes</a></li>
+      <li><a href="#verificacion">Lista de verificación</a></li>
+    </ul></div>
+  </div>
+</nav>
+
 <div class="panel">
   <p class="panel-title">Qué se necesita</p>
   <ul>
@@ -184,7 +228,7 @@
     <li>Los instaladores del JDK 8 de 32 bits y de leJOS NXJ, disponibles en el release <a href="https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt"><code>instaladores-nxt</code></a> del repositorio NXT-java.</li>
     <li>Cable USB del NXT (solo para instalar el firmware leJOS, si el brick no lo tiene).</li>
     <li>Computadora con Windows 11 y <strong>Bluetooth</strong> (las Ceibalitas lo tienen), con permisos de administrador para instalar.</li>
-    <li>VS Code con la extensión <strong>Extension Pack for Java</strong> (Microsoft).</li>
+    <li>VS Code con la extensión <strong>Extension Pack for Java</strong> (si no está instalado, ver el paso 5).</li>
   </ul>
 </div>
 
@@ -197,13 +241,24 @@
   </ul>
 </div>
 
-<h3 class="section-title">Instalación</h3>
+<div class="panel">
+  <p class="panel-title">Cómo ejecutar los comandos de esta guía</p>
+  <p>Todos los comandos y scripts de esta guía se ejecutan en <strong>Windows PowerShell</strong>:</p>
+  <ol>
+    <li>Abrir el menú <strong>Inicio</strong>, escribir <code>PowerShell</code> y elegir <strong>Windows PowerShell</strong>.</li>
+    <li>Copiar el comando o script con el botón <strong>Copiar</strong> de cada recuadro.</li>
+    <li>Pegarlo en la ventana de PowerShell con <strong>clic derecho</strong> (o <strong>Ctrl + V</strong>) y presionar <strong>Enter</strong>. En los scripts de varias líneas, presionar Enter una vez más si el cursor queda esperando.</li>
+  </ol>
+  <p>Cuando la guía indique «abrir una PowerShell nueva», cerrar la ventana y volver a abrirla, para que tome los cambios de las variables de entorno.</p>
+</div>
 
-<div class="step">
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Instalación</h3>
+
+<div class="step" id="paso-1">
   <div class="num">01</div>
   <div class="content">
     <h2>Comprobar qué Java hay instalado</h2>
-    <p>Este script de PowerShell lista todos los Java de la computadora e indica, para cada uno, si es de 32 o 64 bits y si es JDK o solo JRE.</p>
+    <p>Abrir <strong>Windows PowerShell</strong> (menú Inicio → escribir <code>PowerShell</code>), pegar este script completo y presionar <strong>Enter</strong>. Lista todos los Java de la computadora e indica, para cada uno, si es de 32 o 64 bits y si es JDK o solo JRE.</p>
     <div class="term">
       <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
       <pre>$bases = "C:\Program Files (x86)", "C:\Program Files", "C:\Java"
@@ -228,7 +283,7 @@ foreach ($base in $bases) {
   </div>
 </div>
 
-<div class="step">
+<div class="step" id="paso-2">
   <div class="num">02</div>
   <div class="content">
     <h2>Instalar un JDK 8 de 32 bits</h2>
@@ -259,7 +314,7 @@ foreach ($base in $bases) {
   </div>
 </div>
 
-<div class="step">
+<div class="step" id="paso-3">
   <div class="num">03</div>
   <div class="content">
     <h2>Instalar leJOS NXJ 0.9.1beta-3</h2>
@@ -276,12 +331,12 @@ foreach ($base in $bases) {
       <li>En <strong>Select a Java Development Kit</strong>, seleccionar la carpeta <code>C:\Java\jdk8-32</code> (la carpeta raíz, no <code>bin</code>).</li>
       <li>Dejar la carpeta de instalación por defecto: <code>C:\Program Files (x86)\leJOS NXJ</code>.</li>
       <li>En <strong>Select Components</strong>, marcar también <strong>Sample and Example Projects</strong> (ejemplos útiles como referencia). Dejar marcada la documentación.</li>
-      <li>Al final se abre <strong>NXJ Flash</strong>. Si el NXT ya tiene leJOS, <strong>cerrar la ventana sin flashear</strong>: flashear borra todos los programas del brick. Si no lo tiene, cerrarla igual y seguir el paso 5.</li>
+      <li>Al final se abre <strong>NXJ Flash</strong>. Si el NXT ya tiene leJOS, <strong>cerrar la ventana sin flashear</strong>: flashear borra todos los programas del brick. Si no lo tiene, cerrarla igual y seguir el paso 6.</li>
     </ol>
   </div>
 </div>
 
-<div class="step">
+<div class="step" id="paso-4">
   <div class="num">04</div>
   <div class="content">
     <h2>Verificar las variables de entorno</h2>
@@ -294,7 +349,7 @@ nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
     </div>
     <p>El instalador crea estas variables. <code>LEJOS_NXT_JAVA_HOME</code> hace que leJOS use el JDK de 32 bits aunque <code>JAVA_HOME</code> apunte a otro JDK. Si alguna sale vacía, crearla en <strong>Editar las variables de entorno del sistema</strong>.</p>
     <span class="badge opt">Alternativa</span>
-    <p>Si no se pueden crear variables del sistema (por ejemplo, sin permisos de administrador), se pueden definir solo para la terminal de VS Code, agregando esto al <code>settings.json</code> del proyecto (paso 7):</p>
+    <p>Si no se pueden crear variables del sistema (por ejemplo, sin permisos de administrador), se pueden definir solo para la terminal de VS Code, agregando esto al <code>settings.json</code> del proyecto (paso 8):</p>
     <div class="term">
       <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">fragmento de settings.json</span><button type="button">Copiar</button></div>
       <pre>"terminal.integrated.env.windows": {
@@ -306,13 +361,41 @@ nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
   </div>
 </div>
 
-<h3 class="section-title">Firmware leJOS en el NXT</h3>
-
-<div class="step">
+<div class="step" id="paso-5">
   <div class="num">05</div>
   <div class="content">
+    <h2>Instalar VS Code y la extensión de Java</h2>
+    <p>Si VS Code ya está instalado, pasar directamente a la parte de la extensión.</p>
+    <ol>
+      <li>Descargar el instalador desde <a href="https://code.visualstudio.com/download">code.visualstudio.com/download</a>: opción <strong>Windows → User Installer x64</strong>. No requiere permisos de administrador.</li>
+      <li>Durante la instalación, en <strong>Seleccione las tareas adicionales</strong>, dejar marcada <strong>Agregar a PATH</strong> (permite abrir VS Code con el comando <code>code</code>, que usa el script del paso 8). Las opciones <strong>Agregar la acción «Abrir con Code»</strong> son opcionales pero cómodas.</li>
+      <li>Terminar la instalación y <strong>cerrar todas las ventanas de PowerShell</strong> para que reconozcan el comando <code>code</code>.</li>
+    </ol>
+    <span class="badge opt">Alternativa · una sola línea</span>
+    <p>Si la computadora tiene <code>winget</code> (incluido en Windows 11), se puede instalar desde PowerShell:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>winget install --id Microsoft.VisualStudioCode -e --scope user</pre>
+    </div>
+    <p><strong>Instalar la extensión de Java.</strong> En una PowerShell nueva:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>code --install-extension vscjava.vscode-java-pack</pre>
+    </div>
+    <p>También se puede instalar desde VS Code: ícono de <strong>Extensiones</strong> en la barra lateral (o <strong>Ctrl + Shift + X</strong>), buscar <strong>Extension Pack for Java</strong> (de Microsoft) e <strong>Instalar</strong>. El paquete incluye el soporte de lenguaje de Red Hat y el depurador.</p>
+    <p>La extensión trae su propio Java interno para funcionar, así que no hace falta instalar otro JDK además del JDK 8 de 32 bits.</p>
+    <span class="badge ok">Listo si</span>
+    <p><code>code --version</code> muestra un número de versión y, en VS Code, la extensión aparece como instalada.</p>
+  </div>
+</div>
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Firmware leJOS en el NXT</h3>
+
+<div class="step" id="paso-6">
+  <div class="num">06</div>
+  <div class="content">
     <h2>Instalar leJOS en el NXT (si no lo tiene)</h2>
-    <p>Encender el NXT y mirar la pantalla. Si aparece el menú de leJOS (con opciones como <strong>Files</strong>, <strong>Bluetooth</strong>, <strong>System</strong>), ya tiene el firmware: pasar al paso 6. Si aparece el menú original de LEGO (<strong>My Files</strong>, <strong>NXT Program</strong>, <strong>View</strong>…), hay que instalarlo.</p>
+    <p>Encender el NXT y mirar la pantalla. Si aparece el menú de leJOS (con opciones como <strong>Files</strong>, <strong>Bluetooth</strong>, <strong>System</strong>), ya tiene el firmware: pasar al paso 7. Si aparece el menú original de LEGO (<strong>My Files</strong>, <strong>NXT Program</strong>, <strong>View</strong>…), hay que instalarlo.</p>
 
     <span class="badge warn">Antes de empezar</span>
     <ul>
@@ -336,7 +419,7 @@ nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
       <li>Esperar a que la barra de progreso llegue al 100 %. El NXT se reinicia solo y muestra el logo y el menú de leJOS.</li>
     </ol>
 
-    <p>Después de instalarlo, preparar el NXT para el Bluetooth del paso 6:</p>
+    <p>Después de instalarlo, preparar el NXT para el Bluetooth del paso 7:</p>
     <ul>
       <li>En el menú <strong>Bluetooth</strong>, dejar <strong>Power</strong> encendido y <strong>Visibility</strong> activada.</li>
       <li>El PIN por defecto es <strong>1234</strong>.</li>
@@ -354,10 +437,10 @@ nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
   </div>
 </div>
 
-<h3 class="section-title">Conexión por Bluetooth</h3>
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Conexión por Bluetooth</h3>
 
-<div class="step">
-  <div class="num">06</div>
+<div class="step" id="paso-7">
+  <div class="num">07</div>
   <div class="content">
     <h2>Emparejar el NXT con la computadora</h2>
     <ol>
@@ -380,10 +463,10 @@ nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
   </div>
 </div>
 
-<h3 class="section-title">Proyecto en VS Code</h3>
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Proyecto en VS Code</h3>
 
-<div class="step">
-  <div class="num">07</div>
+<div class="step" id="paso-8">
+  <div class="num">08</div>
   <div class="content">
     <h2>Crear el proyecto con un script</h2>
     <p>Este script crea la carpeta <code>Documentos\nxt-hola</code> con su estructura y archivos, y la abre en VS Code. Copiarlo completo, pegarlo en PowerShell y presionar Enter.</p>
@@ -475,8 +558,8 @@ code $base</pre>
   </div>
 </div>
 
-<div class="step">
-  <div class="num">08</div>
+<div class="step" id="paso-9">
+  <div class="num">09</div>
   <div class="content">
     <h2>Subir y ejecutar el primer programa</h2>
     <ol>
@@ -509,8 +592,8 @@ code $base</pre>
   </div>
 </div>
 
-<div class="step">
-  <div class="num">09</div>
+<div class="step" id="paso-10">
+  <div class="num">10</div>
   <div class="content">
     <h2>Segundo programa: explorador con sensor ultrasónico</h2>
     <p><code>DifferentialPilot</code> mueve el robot en centímetros y grados en lugar de vueltas de motor. Conectar el sensor ultrasónico en el puerto <strong>4</strong>. El robot avanza; si detecta un obstáculo a menos de 25 cm, retrocede y gira. Se detiene con el botón gris oscuro (ESCAPE).</p>
@@ -549,8 +632,8 @@ code $base</pre>
 </div>
 
 
-<div class="step">
-  <div class="num">10</div>
+<div class="step" id="paso-11">
+  <div class="num">11</div>
   <div class="content">
     <h2>Clase auxiliar con métodos propios</h2>
     <p>Una clase auxiliar agrupa movimientos frecuentes en métodos con nombres simples. Así se puede empezar usando <code>Robot.avanzar()</code> y más adelante analizar cómo está hecho cada método.</p>
@@ -620,9 +703,9 @@ code $base</pre>
   </div>
 </div>
 
-<h3 class="section-title">Referencia rápida</h3>
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Referencia rápida</h3>
 
-<div class="panel">
+<div class="panel" id="ref-clases">
   <p class="panel-title">Clases más usadas</p>
   <div class="table-wrap">
   <table>
@@ -643,7 +726,7 @@ code $base</pre>
   <p>Los ejemplos instalados con leJOS están en <code>C:\Program Files (x86)\leJOS NXJ\samples</code> (o en la carpeta elegida durante la instalación).</p>
 </div>
 
-<div class="panel">
+<div class="panel" id="ref-herramientas">
   <p class="panel-title">Herramientas incluidas en leJOS NXJ</p>
   <div class="table-wrap">
   <table>
@@ -656,19 +739,19 @@ code $base</pre>
   </div>
 </div>
 
-<div class="panel">
+<div class="panel" id="usb">
   <span class="badge opt">Opcional · conexión por USB</span>
   <p class="panel-title">Usar USB en lugar de Bluetooth</p>
   <p>Requiere el driver <strong>Fantom</strong> de LEGO (versión de 64 bits, disponible en el release <code>instaladores-nxt</code> del repositorio openRoberta-NXT), instalado como administrador y con reinicio. En el <code>tasks.json</code>, cambiar <code>-b</code> por <code>-u</code>.</p>
   <p>En Windows 11 es frecuente que falle con el error <code>cannot load library ... jfantom.dll</code> / <em>Error en una rutina de inicialización de biblioteca de vínculos dinámicos (DLL)</em>, aunque el driver esté instalado. La causa más probable es la <strong>Integridad de memoria</strong> (Seguridad de Windows → Seguridad del dispositivo → Aislamiento del núcleo), que bloquea los componentes antiguos de National Instruments. Desactivarla reduce la seguridad del equipo, por lo que se recomienda usar Bluetooth.</p>
 </div>
 
-<div class="note">
+<div class="note" id="problemas">
   <span class="badge warn">Problemas frecuentes</span>
   <h2>Si algo no funciona</h2>
   <dl>
     <dt>«No NXT found» al subir</dt>
-    <dd>Revisar que el NXT esté encendido con el menú de leJOS, que tenga el Bluetooth encendido y visible, que esté emparejado (paso 6) y que la ventana del File Browser esté cerrada.</dd>
+    <dd>Revisar que el NXT esté encendido con el menú de leJOS, que tenga el Bluetooth encendido y visible, que esté emparejado (paso 7) y que la ventana del File Browser esté cerrada.</dd>
 
     <dt>Se conecta a otro NXT</dt>
     <dd>Ponerle nombre al NXT con <strong>Set Name</strong> en el File Browser y agregar <code>-n NOMBRE</code> al comando <code>nxj</code> del <code>tasks.json</code>.</dd>
@@ -700,16 +783,16 @@ code $base</pre>
 </div>
 
 
-<div class="panel">
+<div class="panel" id="verificacion">
   <p class="panel-title">Lista de verificación</p>
   <ul class="check">
     <li><label><input type="checkbox"> JDK 8 de 32 bits en <code>C:\Java\jdk8-32</code> (<code>javac 1.8</code>)</label></li>
     <li><label><input type="checkbox"> leJOS NXJ 0.9.1beta-3 instalado</label></li>
     <li><label><input type="checkbox"> <code>NXJ_HOME</code> y <code>LEJOS_NXT_JAVA_HOME</code> correctas</label></li>
-    <li><label><input type="checkbox"> NXT con firmware leJOS (paso 5, si hacía falta)</label></li>
+    <li><label><input type="checkbox"> NXT con firmware leJOS (paso 6, si hacía falta)</label></li>
     <li><label><input type="checkbox"> Bluetooth del NXT encendido y visible</label></li>
     <li><label><input type="checkbox"> NXT emparejado con la computadora (PIN 1234)</label></li>
-    <li><label><input type="checkbox"> VS Code con Extension Pack for Java</label></li>
+    <li><label><input type="checkbox"> VS Code instalado (con <code>code</code> en el PATH) y Extension Pack for Java</label></li>
     <li><label><input type="checkbox"> Proyecto creado con <code>settings.json</code> y <code>tasks.json</code></label></li>
     <li><label><input type="checkbox"> <code>HolaNXT</code> subido y ejecutado con Ctrl + Shift + B</label></li>
     <li><label><input type="checkbox"> Clase auxiliar <code>Robot.java</code> funcionando con <code>Cuadrado.java</code></label></li>
