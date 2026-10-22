@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programar el NXT en Java: primeros pasos (leJOS NXJ)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #f6f7fa;
+    --panel: #ffffff;
+    --panel-2: #f0f2f6;
+    --border: #dfe2ea;
+    --text: #1d2030;
+    --muted: #5b6075;
+    --accent: #d9640b;              /* naranja, como el botón ENTER del NXT */
+    --accent-soft: rgba(217,100,11,.10);
+    --green: #1f8a4c;
+    --green-soft: rgba(31,138,76,.10);
+    --blue: #2f5fd0;
+    --blue-soft: rgba(47,95,208,.10);
+    --code-bg: #f3f4f8;
+    --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    --sans: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height:1.55;
+    padding: 48px 20px 80px;
+  }
+  .wrap{ max-width: 780px; margin: 0 auto; }
+
+  header{ margin-bottom: 40px; }
+  .eyebrow{
+    font-family: var(--mono); font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent);
+    display:flex; align-items:center; gap:10px; margin-bottom: 14px;
+  }
+  .eyebrow::before{
+    content:""; width:8px; height:8px; border-radius:50%;
+    background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  h1{
+    font-family: var(--mono); font-weight:800;
+    font-size: clamp(25px, 4vw, 33px); line-height:1.15;
+    margin: 0 0 10px; letter-spacing: -0.01em;
+  }
+  h1 span{ color: var(--accent); }
+  .subtitle{ color: var(--muted); font-size: 15px; max-width: 60ch; margin:0; }
+
+  .section-title{
+    font-family: var(--mono); font-size: 13px; letter-spacing:.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin: 44px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+
+  .step{
+    position: relative; display:grid; grid-template-columns: 56px 1fr;
+    gap: 18px; padding-bottom: 34px;
+  }
+  .step:not(:last-child)::before{
+    content:""; position:absolute; left:27px; top:56px; bottom:0; width:2px;
+    background: linear-gradient(var(--border), transparent);
+  }
+  .num{
+    width:56px; height:56px; border-radius:14px;
+    background: var(--panel); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--mono); font-weight:700; font-size:18px; color: var(--accent);
+  }
+  .content{ padding-top:6px; min-width:0; }
+  .content h2{ font-family: var(--mono); font-size: 16px; font-weight:700; margin: 0 0 8px; }
+  .content p, .content ul, .content ol{ margin: 0 0 12px; color: var(--muted); font-size: 14.5px; }
+  .content ul, .content ol{ padding-left: 20px; }
+  .content li{ margin-bottom: 4px; }
+  .content strong{ color: var(--text); }
+
+  code{
+    font-family: var(--mono); background: var(--panel-2);
+    padding: 2px 6px; border-radius: 5px; font-size: 12.5px; color: var(--text);
+  }
+  a{ color: var(--blue); }
+
+  .term{
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; overflow:hidden; margin: 10px 0 14px;
+  }
+  .term-bar{
+    display:flex; align-items:center; gap:6px; padding: 7px 12px;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .term-bar span.dot{ width:9px; height:9px; border-radius:50%; background: #c9cdd8; }
+  .term-bar .label{
+    margin-left: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+  }
+  .term-bar button{
+    margin-left:auto; font-family: var(--mono); font-size: 11px;
+    border:1px solid var(--border); background: var(--bg); color: var(--muted);
+    border-radius:6px; padding:3px 9px; cursor:pointer;
+  }
+  .term-bar button:hover{ color: var(--accent); border-color: var(--accent); }
+  .term pre{
+    margin:0; padding: 14px 16px; font-family: var(--mono); font-size: 12.8px;
+    color: var(--text); overflow-x:auto; line-height:1.5;
+  }
+  .kw{ color:#a12a8a; font-weight:600; }
+  .ty{ color:#2f5fd0; }
+  .st{ color:#1f8a4c; }
+  .cm{ color:#8a8fa3; font-style: italic; }
+  .nu{ color:#c4570a; }
+
+  .badge{
+    display:inline-flex; align-items:center; font-family: var(--mono);
+    font-size: 11px; font-weight:600; letter-spacing:.04em;
+    padding: 3px 9px; border-radius:999px; margin-bottom:10px; text-transform: uppercase;
+  }
+  .badge.opt{ background: var(--blue-soft); color: var(--blue); }
+  .badge.warn{ background: var(--accent-soft); color: var(--accent); }
+  .badge.ok{ background: var(--green-soft); color: var(--green); }
+
+  .panel{
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px; margin: 10px 0 14px;
+  }
+  .panel p:last-child, .panel ul:last-child{ margin-bottom:0; }
+  .panel-title{ font-family: var(--mono); font-size: 13px; font-weight:700; margin: 0 0 6px; }
+
+  .tree{ font-family: var(--mono); font-size: 12.8px; color: var(--text); white-space: pre; overflow-x:auto; }
+
+  table{ width:100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 14px; }
+  th, td{ text-align:left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th{ font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight:600; }
+  td code{ white-space: nowrap; }
+  .table-wrap{ overflow-x:auto; }
+
+  .note{
+    border-radius: 12px; padding: 16px 18px; background: var(--accent-soft);
+    border: 1px solid rgba(217,100,11,.30); margin-top: 18px;
+  }
+  .note h2{ font-family: var(--mono); font-size: 15px; margin: 0 0 10px; }
+  .note dl{ margin:0; }
+  .note dt{ font-family: var(--mono); font-size: 13px; font-weight:700; margin-top: 12px; }
+  .note dd{ margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+  .check{ list-style:none; padding-left:0 !important; margin:0; }
+  .check li{ margin-bottom:6px; color: var(--muted); font-size:14.5px; }
+  .check input{ accent-color: var(--accent); margin-right:8px; }
+  .toc{ margin-bottom: 8px; }
+  .toc-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 24px; }
+  .toc-sec{ font-family: var(--mono); font-size: 11.5px; letter-spacing:.08em; text-transform: uppercase; color: var(--accent); margin: 10px 0 4px; }
+  .toc ol, .toc ul{ margin: 0 0 6px; padding-left: 22px; font-size: 14px; }
+  .toc li{ margin-bottom: 3px; color: var(--muted); }
+  .toc a{ color: var(--text); text-decoration: none; }
+  .toc a:hover{ color: var(--accent); text-decoration: underline; }
+  .section-title .top{ float:right; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--muted); text-decoration:none; }
+  .section-title .top:hover{ color: var(--accent); }
+  html{ scroll-behavior: smooth; }
+  [id]{ scroll-margin-top: 16px; }
+  @media print{ .section-title .top{ display:none; } }
+  .ej{ border-left: 3px solid var(--accent); padding: 10px 14px; background: var(--panel); border-radius: 0 10px 10px 0; margin: 12px 0 14px; border:1px solid var(--border); border-left:3px solid var(--accent); }
+  .ej p.panel-title{ color: var(--accent); }
+  .ej ol{ margin-bottom:0; }
+  footer{
+    margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--border);
+    text-align:center; font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+
+  @media (max-width: 560px){
+    .step{ grid-template-columns: 1fr; gap: 10px; }
+    .step::before{ display:none; }
+    .num{ width:44px; height:44px; font-size:16px; }
+  }
+  @media print{
+    body{ background:#fff; padding: 0; }
+    .term-bar button{ display:none; }
+    .step, .panel, .term, .note{ break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Robótica · LEGO NXT · Java</div>
+  <h1>Programar el NXT en <span>Java</span>: primeros pasos</h1>
+  <p class="subtitle">De la estructura de un programa a la programación por comportamientos, con leJOS NXJ. Cada tema incluye ejemplos listos para subir y ejercicios.</p>
+</header>
+
+<nav class="toc panel" id="indice">
+  <p class="panel-title">Índice</p>
+  <div class="toc-grid">
+    <div><p class="toc-sec">Fundamentos</p><ol>
+      <li value="1"><a href="#estructura">Estructura de un programa</a></li>
+      <li value="2"><a href="#brick">Pantalla, botones y sonido</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Movimiento</p><ol>
+      <li value="3"><a href="#motores">Motores</a></li>
+      <li value="4"><a href="#clase-auxiliar">Clase auxiliar con métodos propios</a></li>
+      <li value="5"><a href="#pilot">Navegación con DifferentialPilot</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Sensores</p><ol>
+      <li value="6"><a href="#sensores">Sensores: contacto y ultrasónico</a></li>
+      <li value="7"><a href="#luz">Sensor de luz y seguidor de línea</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Programación avanzada</p><ol>
+      <li value="8"><a href="#comportamientos">Comportamientos (Behavior y Arbitrator)</a></li>
+    </ol></div>
+    <div><p class="toc-sec">Proyectos</p><ol>
+      <li value="9"><a href="#proyectos">Proyectos sugeridos</a></li>
+    </ol></div>
+  </div>
+</nav>
+
+<div class="panel">
+  <p class="panel-title">Antes de empezar</p>
+  <p>Esta guía supone el entorno ya instalado y funcionando, según la guía <a href="GuiaNXT-lejos-vscode.html"><strong>Programar el NXT en Java con leJOS y VS Code</strong></a>: proyecto en VS Code, NXT emparejado por Bluetooth y <strong>Ctrl + Shift + B</strong> para compilar, subir y ejecutar.</p>
+  <p>Conexiones usadas en los ejemplos: motor izquierdo en <strong>B</strong>, motor derecho en <strong>C</strong>, sensor de contacto en <strong>1</strong>, sensor de luz en <strong>3</strong> y sensor ultrasónico en <strong>4</strong>.</p>
+</div>
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Fundamentos</h3>
+
+<div class="step" id="estructura">
+  <div class="num">01</div>
+  <div class="content">
+    <h2>Estructura de un programa</h2>
+
+<p>Todo programa para el NXT es una clase de Java con un método <code>main</code>, que es el punto donde empieza la ejecución. Antes de la clase se importan las clases de leJOS que se van a usar: motores, sensores, pantalla, etc.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/HolaMundo.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.<span class="ty">LCD</span>;
+<span class="kw">import</span> lejos.util.<span class="ty">Delay</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">HolaMundo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="cm">// escribe en la columna 0, fila 0 de la pantalla</span>
+        <span class="ty">LCD</span>.drawString(<span class="st">"Hola NXT!"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+
+        <span class="cm">// espera 5 segundos para poder leer el mensaje</span>
+        <span class="ty">Delay</span>.msDelay(<span class="nu">5000</span>);
+    }
+}</pre>
+</div>
+
+<ul>
+  <li><strong>Imports:</strong> se puede importar cada clase (<code>import lejos.nxt.LCD;</code>) o todo un paquete (<code>import lejos.nxt.*;</code>). Las clases más usadas están en <code>lejos.nxt</code>; <code>Delay</code> está en <code>lejos.util</code>.</li>
+  <li><strong>Pausas:</strong> <code>Delay.msDelay(ms)</code> detiene el programa la cantidad de milisegundos indicada. A diferencia de <code>Thread.sleep()</code>, no obliga a usar <code>try/catch</code>.</li>
+  <li><strong>Fin del programa:</strong> cuando <code>main</code> termina, el NXT vuelve al menú de leJOS. Por eso los ejemplos esperan un tiempo o un botón antes de terminar.</li>
+  <li><strong>Pantalla:</strong> tiene 16 columnas (0 a 15) y 8 filas (0 a 7) y no muestra tildes ni eñes.</li>
+</ul>
+<p>Para crear un programa nuevo: agregar un archivo <code>.java</code> en la carpeta <code>src</code>, con el mismo nombre que la clase, tenerlo abierto en el editor y presionar <strong>Ctrl + Shift + B</strong>.</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Modificar <code>HolaMundo</code> para que muestre un nombre en la fila 0 y el grupo en la fila 2.</li><li>Mostrar un mensaje durante 3 segundos, borrar la pantalla con <code>LCD.clear()</code> y mostrar otro mensaje durante 3 segundos más.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="brick">
+  <div class="num">02</div>
+  <div class="content">
+    <h2>Pantalla, botones y sonido</h2>
+
+<p>El brick tiene una pantalla, cuatro botones y un parlante. Las clases <code>LCD</code>, <code>Button</code> y <code>Sound</code> permiten usarlos.</p>
+<div class="table-wrap"><table>
+<tr><th>Método</th><th>Qué hace</th></tr>
+<tr><td><code>LCD.drawString(texto, col, fila)</code></td><td>Escribe un texto.</td></tr>
+<tr><td><code>LCD.drawInt(numero, col, fila)</code></td><td>Escribe un número entero.</td></tr>
+<tr><td><code>LCD.clear()</code></td><td>Borra toda la pantalla.</td></tr>
+<tr><td><code>Button.waitForAnyPress()</code></td><td>Espera que se presione un botón y devuelve cuál fue: <code>Button.ID_ENTER</code>, <code>ID_LEFT</code>, <code>ID_RIGHT</code> o <code>ID_ESCAPE</code>.</td></tr>
+<tr><td><code>Button.ESCAPE.isDown()</code></td><td>Devuelve <code>true</code> mientras el botón está presionado, sin esperar. Existe también para <code>ENTER</code>, <code>LEFT</code> y <code>RIGHT</code>.</td></tr>
+<tr><td><code>Sound.beep()</code> / <code>Sound.buzz()</code></td><td>Pitido corto / zumbido grave.</td></tr>
+<tr><td><code>Sound.playTone(frecuencia, ms)</code></td><td>Toca una nota: frecuencia en Hz, duración en milisegundos.</td></tr>
+</table></div>
+<p>Ejemplo: un contador que sube con el botón derecho, baja con el izquierdo y termina con ESCAPE.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Contador.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.<span class="ty">Button</span>;
+<span class="kw">import</span> lejos.nxt.<span class="ty">LCD</span>;
+<span class="kw">import</span> lejos.nxt.<span class="ty">Sound</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">Contador</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span> valor = <span class="nu">0</span>;
+        <span class="kw">int</span> boton = <span class="nu">0</span>;
+
+        <span class="kw">while</span> (boton != <span class="ty">Button</span>.<span class="ty">ID_ESCAPE</span>) {
+            <span class="ty">LCD</span>.clear();
+            <span class="ty">LCD</span>.drawString(<span class="st">"Contador:"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+            <span class="ty">LCD</span>.drawInt(valor, <span class="nu">0</span>, <span class="nu">2</span>);
+            <span class="ty">LCD</span>.drawString(<span class="st">"ESC para salir"</span>, <span class="nu">0</span>, <span class="nu">6</span>);
+
+            boton = <span class="ty">Button</span>.waitForAnyPress();
+            <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_RIGHT</span>) {
+                valor++;
+                <span class="ty">Sound</span>.beep();
+            } <span class="kw">else</span> <span class="kw">if</span> (boton == <span class="ty">Button</span>.<span class="ty">ID_LEFT</span>) {
+                valor--;
+                <span class="ty">Sound</span>.buzz();
+            }
+        }
+    }
+}</pre>
+</div>
+
+<p>En leJOS, <code>System.out.println()</code> también escribe en la pantalla del NXT, línea por línea y desplazando el texto hacia arriba. Es útil para mostrar mensajes de seguimiento.</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Agregar al contador que con ENTER vuelva a 0.</li><li>Hacer que el contador no baje de 0 ni suba de 10, y que emita <code>Sound.buzz()</code> al intentar pasarse.</li><li>Tocar una escala con <code>Sound.playTone()</code>: por ejemplo, 262, 294, 330, 349, 392, 440, 494 y 523 Hz, 300 ms cada nota.</li></ol></div>
+  </div>
+</div>
+
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Movimiento</h3>
+
+<div class="step" id="motores">
+  <div class="num">03</div>
+  <div class="content">
+    <h2>Motores</h2>
+
+<p>Los motores se conectan en los puertos <strong>A</strong>, <strong>B</strong> y <strong>C</strong>, y se controlan con <code>Motor.A</code>, <code>Motor.B</code> y <code>Motor.C</code>. En los ejemplos, el robot tiene la rueda izquierda en <strong>B</strong> y la derecha en <strong>C</strong>.</p>
+<div class="table-wrap"><table>
+<tr><th>Método</th><th>Qué hace</th></tr>
+<tr><td><code>setSpeed(gradosPorSegundo)</code></td><td>Velocidad. Con pilas cargadas, el máximo ronda los 700–900.</td></tr>
+<tr><td><code>forward()</code> / <code>backward()</code></td><td>Gira hacia adelante / atrás <strong>sin detenerse</strong>, hasta recibir otra orden.</td></tr>
+<tr><td><code>stop()</code></td><td>Frena el motor y espera a que se detenga.</td></tr>
+<tr><td><code>stop(true)</code></td><td>Frena el motor sin esperar: permite frenar dos motores casi a la vez.</td></tr>
+<tr><td><code>rotate(grados)</code></td><td>Gira esa cantidad de grados (360 = una vuelta de rueda) y espera a terminar.</td></tr>
+<tr><td><code>rotate(grados, true)</code></td><td>Igual, pero sin esperar: el programa sigue a la línea siguiente.</td></tr>
+<tr><td><code>getTachoCount()</code></td><td>Grados girados desde el inicio (el motor tiene un sensor de rotación incorporado).</td></tr>
+</table></div>
+<p><strong>Movimiento por tiempo</strong> con <code>forward()</code>, <code>backward()</code> y <code>stop()</code>:</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/MoverYGirar.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.<span class="ty">Motor</span>;
+<span class="kw">import</span> lejos.util.<span class="ty">Delay</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">MoverYGirar</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">Motor</span>.<span class="ty">B</span>.setSpeed(<span class="nu">400</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.setSpeed(<span class="nu">400</span>);
+
+        <span class="ty">System</span>.out.println(<span class="st">"Avanzando"</span>);
+        <span class="ty">Motor</span>.<span class="ty">B</span>.forward();
+        <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+        <span class="ty">Delay</span>.msDelay(<span class="nu">2000</span>);
+
+        <span class="ty">System</span>.out.println(<span class="st">"Frenando"</span>);
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);       <span class="cm">// no espera: frena B y sigue</span>
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();           <span class="cm">// espera a que C se detenga</span>
+        <span class="ty">Delay</span>.msDelay(<span class="nu">500</span>);
+
+        <span class="ty">System</span>.out.println(<span class="st">"Girando"</span>);
+        <span class="ty">Motor</span>.<span class="ty">B</span>.forward();        <span class="cm">// una rueda adelante...</span>
+        <span class="ty">Motor</span>.<span class="ty">C</span>.backward();       <span class="cm">// ...y la otra atras: gira en el lugar</span>
+        <span class="ty">Delay</span>.msDelay(<span class="nu">1000</span>);
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+    }
+}</pre>
+</div>
+
+<p><strong>Movimiento por ángulo</strong> con <code>rotate()</code>: más preciso que por tiempo, porque no depende de la carga de las pilas.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">fragmento</span><button type="button">Copiar</button></div>
+  <pre><span class="ty">Motor</span>.<span class="ty">B</span>.rotate(<span class="nu">720</span>, <span class="kw">true</span>);   <span class="cm">// true: arranca B y sigue sin esperar</span>
+<span class="ty">Motor</span>.<span class="ty">C</span>.rotate(<span class="nu">720</span>);         <span class="cm">// arranca C y espera: las dos ruedas giran juntas</span></pre>
+</div>
+
+<p>Si se usara <code>rotate(720)</code> en los dos motores, primero giraría uno y después el otro, y el robot avanzaría torcido.</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Hacer que el robot avance 2 segundos, retroceda 2 segundos y emita un pitido.</li><li>Usando <code>rotate()</code>, encontrar cuántos grados de rueda hacen falta para que el robot gire 90°. Anotar el valor: se usa en los próximos temas.</li><li>Recorrer un cuadrado con un <code>for</code> de 4 repeticiones.</li><li>Mostrar en pantalla el valor de <code>Motor.B.getTachoCount()</code> antes y después de avanzar.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="clase-auxiliar">
+  <div class="num">04</div>
+  <div class="content">
+    <h2>Clase auxiliar con métodos propios</h2>
+
+<p>Cuando los mismos movimientos se repiten en varios programas, conviene agruparlos en una <strong>clase auxiliar</strong> con métodos de nombres simples. Primero se usan los métodos (<code>Robot.avanzar(720)</code>) y después se analiza cómo está hecho cada uno.</p>
+<span class="badge warn">Nombre de la clase</span>
+<p>No llamarla <code>NXT</code>: leJOS ya tiene una clase <code>lejos.nxt.NXT</code> y el nombre se presta a confusión.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Robot.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.<span class="ty">Button</span>;
+<span class="kw">import</span> lejos.nxt.<span class="ty">LCD</span>;
+<span class="kw">import</span> lejos.nxt.<span class="ty">Motor</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">Robot</span> {
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> velocidad(<span class="kw">int</span> gradosPorSegundo) {
+        <span class="ty">Motor</span>.<span class="ty">B</span>.setSpeed(gradosPorSegundo);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.setSpeed(gradosPorSegundo);
+    }
+
+    <span class="cm">// gradosRueda: cuanto gira cada rueda (360 = una vuelta)</span>
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> avanzar(<span class="kw">int</span> gradosRueda) {
+        <span class="ty">Motor</span>.<span class="ty">B</span>.rotate(gradosRueda, <span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.rotate(gradosRueda);
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> retroceder(<span class="kw">int</span> gradosRueda) {
+        avanzar(-gradosRueda);
+    }
+
+    <span class="cm">// las ruedas giran en sentidos opuestos: el robot gira en el lugar</span>
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> girarDerecha(<span class="kw">int</span> gradosRueda) {
+        <span class="ty">Motor</span>.<span class="ty">B</span>.rotate(gradosRueda, <span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.rotate(-gradosRueda);
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> girarIzquierda(<span class="kw">int</span> gradosRueda) {
+        girarDerecha(-gradosRueda);
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> mostrar(<span class="ty">String</span> texto, <span class="kw">int</span> fila) {
+        <span class="ty">LCD</span>.drawString(texto, <span class="nu">0</span>, fila);
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> esperarBoton() {
+        <span class="ty">Button</span>.waitForAnyPress();
+    }
+}</pre>
+</div>
+<p>Un programa que usa la clase auxiliar:</p><div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Cuadrado.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">public</span> <span class="kw">class</span> <span class="ty">Cuadrado</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">Robot</span>.mostrar(<span class="st">"Cuadrado"</span>, <span class="nu">0</span>);
+        <span class="ty">Robot</span>.esperarBoton();
+        <span class="ty">Robot</span>.velocidad(<span class="nu">300</span>);
+
+        <span class="kw">for</span> (<span class="kw">int</span> lado = <span class="nu">1</span>; lado &lt;= <span class="nu">4</span>; lado++) {
+            <span class="ty">Robot</span>.avanzar(<span class="nu">720</span>);
+            <span class="ty">Robot</span>.girarDerecha(<span class="nu">180</span>);   <span class="cm">// ajustar hasta lograr 90 grados</span>
+        }
+        <span class="ty">Robot</span>.mostrar(<span class="st">"Fin"</span>, <span class="nu">2</span>);
+        <span class="ty">Robot</span>.esperarBoton();
+    }
+}</pre>
+</div>
+
+<p>Guardar los dos archivos en <code>src</code>, abrir <code>Cuadrado.java</code> (el que tiene el <code>main</code>) y presionar <strong>Ctrl + Shift + B</strong>. <code>Robot.java</code> se compila sola.</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Agregar a <code>Robot</code> un método <code>girar90Derecha()</code> que use el valor encontrado en el tema de motores.</li><li>Agregar un método <code>poligono(int lados)</code> que recorra un polígono regular (pista: el giro total es 360°, repartido entre los lados).</li><li>Dibujar un triángulo y un hexágono con <code>poligono()</code>.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="pilot">
+  <div class="num">05</div>
+  <div class="content">
+    <h2>Navegación con DifferentialPilot</h2>
+
+<p><code>DifferentialPilot</code> controla las dos ruedas juntas y permite indicar distancias en <strong>centímetros</strong> y giros en <strong>grados del robot</strong>, en lugar de grados de rueda. Necesita dos medidas del robot: el diámetro de la rueda y la distancia entre las dos ruedas.</p>
+<div class="table-wrap"><table>
+<tr><th>Método</th><th>Qué hace</th></tr>
+<tr><td><code>setTravelSpeed(cmPorSegundo)</code></td><td>Velocidad de avance.</td></tr>
+<tr><td><code>travel(cm)</code></td><td>Avanza (o retrocede, con valor negativo) esa distancia.</td></tr>
+<tr><td><code>rotate(grados)</code></td><td>Gira el robot en el lugar.</td></tr>
+<tr><td><code>arc(radio, grados)</code></td><td>Avanza describiendo un arco.</td></tr>
+<tr><td><code>forward()</code> / <code>stop()</code></td><td>Avanza sin parar / se detiene.</td></tr>
+</table></div>
+<p>Ejemplo: explorador que esquiva obstáculos con el sensor ultrasónico en el puerto 4. Se detiene con el botón gris oscuro (ESCAPE).</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Explorador.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+<span class="kw">import</span> lejos.robotics.navigation.<span class="ty">DifferentialPilot</span>;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">Explorador</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="cm">// diametro de rueda y distancia entre ruedas, en cm (medir el robot)</span>
+        <span class="ty">DifferentialPilot</span> piloto =
+            <span class="kw">new</span> <span class="ty">DifferentialPilot</span>(<span class="nu">5.6</span>, <span class="nu">11.2</span>, <span class="ty">Motor</span>.<span class="ty">B</span>, <span class="ty">Motor</span>.<span class="ty">C</span>);
+        <span class="ty">UltrasonicSensor</span> sonar = <span class="kw">new</span> <span class="ty">UltrasonicSensor</span>(<span class="ty">SensorPort</span>.<span class="ty">S4</span>);
+
+        piloto.setTravelSpeed(<span class="nu">15</span>);       <span class="cm">// cm por segundo</span>
+        <span class="ty">LCD</span>.drawString(<span class="st">"Explorador"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+        <span class="ty">Button</span>.waitForAnyPress();
+
+        <span class="kw">while</span> (!<span class="ty">Button</span>.<span class="ty">ESCAPE</span>.isDown()) {
+            <span class="kw">if</span> (sonar.getDistance() &lt; <span class="nu">25</span>) {
+                piloto.stop();
+                <span class="ty">Sound</span>.beep();
+                piloto.travel(-<span class="nu">10</span>);       <span class="cm">// retrocede 10 cm</span>
+                piloto.rotate(<span class="nu">90</span>);        <span class="cm">// gira 90 grados</span>
+            } <span class="kw">else</span> {
+                piloto.forward();
+            }
+        }
+        piloto.stop();
+    }
+}</pre>
+</div>
+
+<p>Si el robot gira de más o de menos, ajustar la distancia entre ruedas (11.2); si avanza de más o de menos, ajustar el diámetro (5.6).</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Calibrar el piloto: pedir <code>travel(50)</code> y medir con una regla cuánto avanzó realmente; pedir <code>rotate(360)</code> y ver si da una vuelta exacta.</li><li>Recorrer un rectángulo de 40 × 20 cm con <code>travel()</code> y <code>rotate()</code>.</li><li>Dibujar un círculo con <code>arc()</code>.</li></ol></div>
+  </div>
+</div>
+
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Sensores</h3>
+
+<div class="step" id="sensores">
+  <div class="num">06</div>
+  <div class="content">
+    <h2>Sensores: contacto y ultrasónico</h2>
+
+<p>Para usar un sensor se crea un objeto de su clase indicando el puerto donde está conectado: <code>SensorPort.S1</code> a <code>SensorPort.S4</code>.</p>
+<p><strong>Sensor de contacto</strong> (<code>TouchSensor</code>): <code>isPressed()</code> devuelve <code>true</code> mientras está presionado. Ejemplo: avanzar hasta chocar.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/DetectorToque.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">DetectorToque</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">TouchSensor</span> tacto = <span class="kw">new</span> <span class="ty">TouchSensor</span>(<span class="ty">SensorPort</span>.<span class="ty">S1</span>);
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.forward();
+        <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+
+        <span class="kw">while</span> (!tacto.isPressed()) {
+            <span class="cm">// repetir hasta que el sensor se presione</span>
+        }
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+        <span class="ty">Sound</span>.beep();
+        <span class="ty">Button</span>.waitForAnyPress();
+    }
+}</pre>
+</div>
+
+<p><strong>Sensor ultrasónico</strong> (<code>UltrasonicSensor</code>): <code>getDistance()</code> devuelve la distancia al objeto más cercano en centímetros (255 si no detecta nada). Ejemplo: avanzar hasta quedar a 25 cm de un obstáculo.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/FrenarAntesDeChocar.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">FrenarAntesDeChocar</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">UltrasonicSensor</span> sonar = <span class="kw">new</span> <span class="ty">UltrasonicSensor</span>(<span class="ty">SensorPort</span>.<span class="ty">S4</span>);
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.forward();
+        <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+
+        <span class="kw">while</span> (sonar.getDistance() &gt; <span class="nu">25</span>) {
+            <span class="ty">LCD</span>.drawString(<span class="st">"Dist:    "</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+            <span class="ty">LCD</span>.drawInt(sonar.getDistance(), <span class="nu">6</span>, <span class="nu">0</span>);
+        }
+
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+        <span class="ty">Sound</span>.buzz();
+        <span class="ty">Button</span>.waitForAnyPress();
+    }
+}</pre>
+</div>
+
+<p>Los <code>while</code> de estos ejemplos repiten la consulta al sensor una y otra vez hasta que se cumple la condición: es la forma más simple de "esperar" a que pase algo.</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Al chocar, retroceder 1 segundo, girar y volver a avanzar. Repetir hasta presionar ESCAPE.</li><li>Hacer un "sensor de estacionamiento": pitidos más rápidos cuanto más cerca está el obstáculo (pista: <code>Delay.msDelay(distancia * 10)</code> entre pitido y pitido).</li><li>Hacer que el robot mantenga una distancia de 20 cm con una mano que se acerca y se aleja: avanzar si está lejos, retroceder si está cerca.</li></ol></div>
+  </div>
+</div>
+
+
+<div class="step" id="luz">
+  <div class="num">07</div>
+  <div class="content">
+    <h2>Sensor de luz y seguidor de línea</h2>
+
+<p><code>LightSensor</code> mide la luz reflejada por la superficie que tiene debajo: <code>getLightValue()</code> devuelve un valor aproximado entre 0 (oscuro) y 100 (claro). Al crearlo, enciende su luz roja para iluminar el piso.</p>
+<p><strong>Paso 1: medir.</strong> Los valores dependen del piso, la cinta y la iluminación del aula, así que primero hay que medirlos. Este programa muestra el valor en pantalla: apoyar el sensor sobre la línea negra y sobre el fondo blanco, y anotar los dos números.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/MedirLuz.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">MedirLuz</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">LightSensor</span> luz = <span class="kw">new</span> <span class="ty">LightSensor</span>(<span class="ty">SensorPort</span>.<span class="ty">S3</span>);
+
+        <span class="kw">while</span> (!<span class="ty">Button</span>.<span class="ty">ESCAPE</span>.isDown()) {
+            <span class="ty">LCD</span>.drawString(<span class="st">"Luz:    "</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+            <span class="ty">LCD</span>.drawInt(luz.getLightValue(), <span class="nu">5</span>, <span class="nu">0</span>);
+        }
+    }
+}</pre>
+</div>
+
+<p><strong>Paso 2: seguir la línea.</strong> El umbral es el punto medio entre los dos valores medidos: por ejemplo, si el negro da 35 y el blanco 55, el umbral es 45. El robot sigue el <strong>borde</strong> de la línea: si ve negro, dobla hacia un lado; si ve blanco, dobla hacia el otro. Así avanza zigzagueando sobre el borde.</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/SeguidorDeLinea.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">SeguidorDeLinea</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">LightSensor</span> luz = <span class="kw">new</span> <span class="ty">LightSensor</span>(<span class="ty">SensorPort</span>.<span class="ty">S3</span>);
+        <span class="kw">int</span> umbral = <span class="nu">45</span>;           <span class="cm">// (negro + blanco) / 2, con los valores medidos</span>
+
+        <span class="ty">LCD</span>.drawString(<span class="st">"Seguidor"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+        <span class="ty">Button</span>.waitForAnyPress();
+        <span class="ty">Motor</span>.<span class="ty">B</span>.forward();
+        <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+
+        <span class="kw">while</span> (!<span class="ty">Button</span>.<span class="ty">ESCAPE</span>.isDown()) {
+            <span class="kw">if</span> (luz.getLightValue() &lt; umbral) {
+                <span class="cm">// sobre la linea negra: doblar hacia afuera</span>
+                <span class="ty">Motor</span>.<span class="ty">B</span>.setSpeed(<span class="nu">250</span>);
+                <span class="ty">Motor</span>.<span class="ty">C</span>.setSpeed(<span class="nu">80</span>);
+            } <span class="kw">else</span> {
+                <span class="cm">// sobre el fondo blanco: doblar hacia la linea</span>
+                <span class="ty">Motor</span>.<span class="ty">B</span>.setSpeed(<span class="nu">80</span>);
+                <span class="ty">Motor</span>.<span class="ty">C</span>.setSpeed(<span class="nu">250</span>);
+            }
+        }
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+    }
+}</pre>
+</div>
+
+<p>Si el robot se escapa de la línea en las curvas, bajar las velocidades. Si se aleja de la línea en lugar de seguirla, intercambiar las velocidades de los dos casos (está siguiendo el otro borde).</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Mostrar en pantalla, mientras sigue la línea, si el sensor ve "NEGRO" o "BLANCO".</li><li>Detener el robot cuando el sensor ultrasónico detecta un obstáculo en la línea y continuar cuando se retira.</li><li>Desafío: seguidor <em>proporcional</em>. En lugar de dos velocidades fijas, calcular <code>error = luz - umbral</code> y usar <code>200 + error * 5</code> para un motor y <code>200 - error * 5</code> para el otro. Comparar qué tan suave es el recorrido.</li></ol></div>
+  </div>
+</div>
+
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Programación avanzada</h3>
+
+<div class="step" id="comportamientos">
+  <div class="num">08</div>
+  <div class="content">
+    <h2>Comportamientos (Behavior y Arbitrator)</h2>
+
+<p>Cuando un robot tiene que hacer varias cosas (avanzar, esquivar, detenerse), los <code>if</code> anidados se vuelven difíciles de leer. La programación por <strong>comportamientos</strong> divide el problema: cada comportamiento es una clase que implementa la interfaz <code>Behavior</code>, y un <code>Arbitrator</code> decide cuál actúa en cada momento.</p>
+<div class="table-wrap"><table>
+<tr><th>Método de Behavior</th><th>Qué debe hacer</th></tr>
+<tr><td><code>takeControl()</code></td><td>Devolver <code>true</code> cuando el comportamiento quiere actuar (por ejemplo, si el sensor está presionado).</td></tr>
+<tr><td><code>action()</code></td><td>Lo que hace el robot cuando el comportamiento tiene el control.</td></tr>
+<tr><td><code>suppress()</code></td><td>Detener <code>action()</code> cuando otro comportamiento más importante toma el control.</td></tr>
+</table></div>
+<span class="badge warn">Prioridad</span>
+<p>En el array que recibe el <code>Arbitrator</code>, <strong>el último comportamiento es el de mayor prioridad</strong> y el primero, el de menor. Si dos quieren actuar a la vez, gana el que está más al final.</p>
+<p>Ejemplo: el robot avanza; si choca, retrocede y gira; con ESCAPE termina el programa. Las cuatro clases van en el mismo archivo (solo la que tiene el <code>main</code> es <code>public</code>).</p>
+<div class="term">
+  <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/RobotConComportamientos.java</span><button type="button">Copiar</button></div>
+  <pre><span class="kw">import</span> lejos.nxt.*;
+<span class="kw">import</span> lejos.robotics.subsumption.*;
+<span class="kw">import</span> lejos.util.<span class="ty">Delay</span>;
+
+<span class="cm">// Comportamiento 1 (prioridad baja): avanzar</span>
+<span class="kw">class</span> <span class="ty">Avanzar</span> <span class="kw">implements</span> <span class="ty">Behavior</span> {
+    <span class="kw">private</span> <span class="kw">boolean</span> suprimido = <span class="kw">false</span>;
+
+    <span class="kw">public</span> <span class="kw">boolean</span> takeControl() {
+        <span class="kw">return</span> <span class="kw">true</span>;                 <span class="cm">// siempre quiere avanzar</span>
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> action() {
+        suprimido = <span class="kw">false</span>;
+        <span class="ty">Motor</span>.<span class="ty">B</span>.forward();
+        <span class="ty">Motor</span>.<span class="ty">C</span>.forward();
+        <span class="kw">while</span> (!suprimido) {
+            <span class="ty">Thread</span>.yield();          <span class="cm">// espera sin bloquear a los demas</span>
+        }
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> suppress() {
+        suprimido = <span class="kw">true</span>;
+    }
+}
+
+<span class="cm">// Comportamiento 2 (prioridad media): esquivar al chocar</span>
+<span class="kw">class</span> <span class="ty">Esquivar</span> <span class="kw">implements</span> <span class="ty">Behavior</span> {
+    <span class="kw">private</span> <span class="ty">TouchSensor</span> tacto;
+
+    <span class="kw">public</span> <span class="ty">Esquivar</span>(<span class="ty">SensorPort</span> puerto) {
+        tacto = <span class="kw">new</span> <span class="ty">TouchSensor</span>(puerto);
+    }
+
+    <span class="kw">public</span> <span class="kw">boolean</span> takeControl() {
+        <span class="kw">return</span> tacto.isPressed();
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> action() {
+        <span class="ty">Motor</span>.<span class="ty">B</span>.backward();          <span class="cm">// retroceder 1 segundo</span>
+        <span class="ty">Motor</span>.<span class="ty">C</span>.backward();
+        <span class="ty">Delay</span>.msDelay(<span class="nu">1000</span>);
+        <span class="ty">Motor</span>.<span class="ty">B</span>.stop(<span class="kw">true</span>);          <span class="cm">// detener los dos antes de girar</span>
+        <span class="ty">Motor</span>.<span class="ty">C</span>.stop();
+        <span class="ty">Motor</span>.<span class="ty">B</span>.rotate(<span class="nu">360</span>, <span class="kw">true</span>);   <span class="cm">// girar en el lugar</span>
+        <span class="ty">Motor</span>.<span class="ty">C</span>.rotate(-<span class="nu">360</span>);
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> suppress() {
+        <span class="cm">// action() es corta: no hace falta interrumpirla</span>
+    }
+}
+
+<span class="cm">// Comportamiento 3 (prioridad alta): terminar con ESCAPE</span>
+<span class="kw">class</span> <span class="ty">Salir</span> <span class="kw">implements</span> <span class="ty">Behavior</span> {
+    <span class="kw">public</span> <span class="kw">boolean</span> takeControl() {
+        <span class="kw">return</span> <span class="ty">Button</span>.<span class="ty">ESCAPE</span>.isDown();
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> action() {
+        <span class="ty">System</span>.exit(<span class="nu">0</span>);
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> suppress() { }
+}
+
+<span class="kw">public</span> <span class="kw">class</span> <span class="ty">RobotConComportamientos</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">Behavior</span> avanzar = <span class="kw">new</span> <span class="ty">Avanzar</span>();
+        <span class="ty">Behavior</span> esquivar = <span class="kw">new</span> <span class="ty">Esquivar</span>(<span class="ty">SensorPort</span>.<span class="ty">S1</span>);
+        <span class="ty">Behavior</span> salir = <span class="kw">new</span> <span class="ty">Salir</span>();
+
+        <span class="cm">// de menor a mayor prioridad</span>
+        <span class="ty">Behavior</span>[] comportamientos = { avanzar, esquivar, salir };
+
+        <span class="ty">Arbitrator</span> arbitro = <span class="kw">new</span> <span class="ty">Arbitrator</span>(comportamientos);
+        arbitro.start();
+    }
+}</pre>
+</div>
+
+<p>Este patrón se relaciona directamente con POO: cada comportamiento es una clase que <strong>implementa una interfaz</strong>, y el <code>Arbitrator</code> los maneja a todos de la misma forma, como objetos de tipo <code>Behavior</code> (polimorfismo).</p>
+<div class="ej"><p class="panel-title">Ejercicios</p><ol><li>Agregar un comportamiento <code>EsquivarConSonar</code> que gire cuando el sensor ultrasónico detecta algo a menos de 20 cm. Decidir en qué posición del array va.</li><li>Cambiar el orden del array (poner <code>avanzar</code> al final) y observar qué pasa. Explicar por qué.</li><li>Pasar cada comportamiento a su propio archivo <code>.java</code> como clase <code>public</code>.</li></ol></div>
+  </div>
+</div>
+
+
+<h3 class="section-title"><a class="top" href="#indice">↑ índice</a>Proyectos</h3>
+
+<div class="step" id="proyectos">
+  <div class="num">09</div>
+  <div class="content">
+    <h2>Proyectos sugeridos</h2>
+
+<p>Proyectos para integrar lo visto. Conviene resolverlos en etapas: primero un movimiento básico, después agregar sensores y por último mejorar la precisión.</p>
+<div class="table-wrap"><table>
+<tr><th>Proyecto</th><th>Qué integra</th></tr>
+<tr><td><strong>Robot explorador</strong>: recorre el aula sin chocar, esquivando con el sensor ultrasónico y con el de contacto como respaldo.</td><td>Sensores, <code>DifferentialPilot</code>, comportamientos.</td></tr>
+<tr><td><strong>Seguidor de línea con paradas</strong>: sigue una pista y se detiene unos segundos al encontrar una marca (por ejemplo, una zona más oscura) o un obstáculo.</td><td>Sensor de luz, ultrasónico, calibración.</td></tr>
+<tr><td><strong>Laberinto simple</strong>: sale de un laberinto armado con cajas siguiendo la regla de la mano derecha (girar a la derecha cuando se puede, a la izquierda cuando hay pared).</td><td>Ultrasónico, contacto, toma de decisiones.</td></tr>
+<tr><td><strong>Robot dibujante</strong>: con un marcador sujeto al robot, dibuja polígonos regulares elegidos con los botones (cantidad de lados en pantalla, ENTER para dibujar).</td><td>Botones, pantalla, clase auxiliar, <code>for</code>.</td></tr>
+<tr><td><strong>Alarma de proximidad</strong>: queda quieto vigilando y suena una melodía si alguien se acerca a menos de 50 cm; se desactiva con una secuencia de botones.</td><td>Ultrasónico, sonido, botones, estados.</td></tr>
+</table></div>
+<p>Para consultar todos los métodos disponibles: la documentación de la API instalada con leJOS, en <code>C:\Program Files (x86)\leJOS NXJ\docs</code>, y los ejemplos en la carpeta <code>samples</code>.</p>
+  </div>
+</div>
+
+
+<footer>Material-Robotica · Prof. Elizabeth Izquierdo · LEGO NXT + leJOS NXJ 0.9.1</footer>
+
+</div>
+<script>
+  document.querySelectorAll('.term').forEach(function (term) {
+    var btn = term.querySelector('button');
+    var pre = term.querySelector('pre');
+    if (!btn || !pre) return;
+    btn.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        btn.textContent = 'Copiado';
+        setTimeout(function () { btn.textContent = 'Copiar'; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {});
+      }
+    });
+  });
+</script>
+</body>
+</html>
