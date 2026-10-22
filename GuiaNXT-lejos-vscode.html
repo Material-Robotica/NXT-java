@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programar el LEGO NXT en Java con leJOS y VS Code (Windows, Bluetooth)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #f6f7fa;
+    --panel: #ffffff;
+    --panel-2: #f0f2f6;
+    --border: #dfe2ea;
+    --text: #1d2030;
+    --muted: #5b6075;
+    --accent: #d9640b;              /* naranja, como el botón ENTER del NXT */
+    --accent-soft: rgba(217,100,11,.10);
+    --green: #1f8a4c;
+    --green-soft: rgba(31,138,76,.10);
+    --blue: #2f5fd0;
+    --blue-soft: rgba(47,95,208,.10);
+    --code-bg: #f3f4f8;
+    --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    --sans: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height:1.55;
+    padding: 48px 20px 80px;
+  }
+  .wrap{ max-width: 780px; margin: 0 auto; }
+
+  header{ margin-bottom: 40px; }
+  .eyebrow{
+    font-family: var(--mono); font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent);
+    display:flex; align-items:center; gap:10px; margin-bottom: 14px;
+  }
+  .eyebrow::before{
+    content:""; width:8px; height:8px; border-radius:50%;
+    background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  h1{
+    font-family: var(--mono); font-weight:800;
+    font-size: clamp(25px, 4vw, 33px); line-height:1.15;
+    margin: 0 0 10px; letter-spacing: -0.01em;
+  }
+  h1 span{ color: var(--accent); }
+  .subtitle{ color: var(--muted); font-size: 15px; max-width: 60ch; margin:0; }
+
+  .section-title{
+    font-family: var(--mono); font-size: 13px; letter-spacing:.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin: 44px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+
+  .step{
+    position: relative; display:grid; grid-template-columns: 56px 1fr;
+    gap: 18px; padding-bottom: 34px;
+  }
+  .step:not(:last-child)::before{
+    content:""; position:absolute; left:27px; top:56px; bottom:0; width:2px;
+    background: linear-gradient(var(--border), transparent);
+  }
+  .num{
+    width:56px; height:56px; border-radius:14px;
+    background: var(--panel); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--mono); font-weight:700; font-size:18px; color: var(--accent);
+  }
+  .content{ padding-top:6px; min-width:0; }
+  .content h2{ font-family: var(--mono); font-size: 16px; font-weight:700; margin: 0 0 8px; }
+  .content p, .content ul, .content ol{ margin: 0 0 12px; color: var(--muted); font-size: 14.5px; }
+  .content ul, .content ol{ padding-left: 20px; }
+  .content li{ margin-bottom: 4px; }
+  .content strong{ color: var(--text); }
+
+  code{
+    font-family: var(--mono); background: var(--panel-2);
+    padding: 2px 6px; border-radius: 5px; font-size: 12.5px; color: var(--text);
+  }
+  a{ color: var(--blue); }
+
+  .term{
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; overflow:hidden; margin: 10px 0 14px;
+  }
+  .term-bar{
+    display:flex; align-items:center; gap:6px; padding: 7px 12px;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .term-bar span.dot{ width:9px; height:9px; border-radius:50%; background: #c9cdd8; }
+  .term-bar .label{
+    margin-left: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+  }
+  .term-bar button{
+    margin-left:auto; font-family: var(--mono); font-size: 11px;
+    border:1px solid var(--border); background: var(--bg); color: var(--muted);
+    border-radius:6px; padding:3px 9px; cursor:pointer;
+  }
+  .term-bar button:hover{ color: var(--accent); border-color: var(--accent); }
+  .term pre{
+    margin:0; padding: 14px 16px; font-family: var(--mono); font-size: 12.8px;
+    color: var(--text); overflow-x:auto; line-height:1.5;
+  }
+  .kw{ color:#a12a8a; font-weight:600; }
+  .ty{ color:#2f5fd0; }
+  .st{ color:#1f8a4c; }
+  .cm{ color:#8a8fa3; font-style: italic; }
+  .nu{ color:#c4570a; }
+
+  .badge{
+    display:inline-flex; align-items:center; font-family: var(--mono);
+    font-size: 11px; font-weight:600; letter-spacing:.04em;
+    padding: 3px 9px; border-radius:999px; margin-bottom:10px; text-transform: uppercase;
+  }
+  .badge.opt{ background: var(--blue-soft); color: var(--blue); }
+  .badge.warn{ background: var(--accent-soft); color: var(--accent); }
+  .badge.ok{ background: var(--green-soft); color: var(--green); }
+
+  .panel{
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px; margin: 10px 0 14px;
+  }
+  .panel p:last-child, .panel ul:last-child{ margin-bottom:0; }
+  .panel-title{ font-family: var(--mono); font-size: 13px; font-weight:700; margin: 0 0 6px; }
+
+  .tree{ font-family: var(--mono); font-size: 12.8px; color: var(--text); white-space: pre; overflow-x:auto; }
+
+  table{ width:100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 14px; }
+  th, td{ text-align:left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th{ font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight:600; }
+  td code{ white-space: nowrap; }
+  .table-wrap{ overflow-x:auto; }
+
+  .note{
+    border-radius: 12px; padding: 16px 18px; background: var(--accent-soft);
+    border: 1px solid rgba(217,100,11,.30); margin-top: 18px;
+  }
+  .note h2{ font-family: var(--mono); font-size: 15px; margin: 0 0 10px; }
+  .note dl{ margin:0; }
+  .note dt{ font-family: var(--mono); font-size: 13px; font-weight:700; margin-top: 12px; }
+  .note dd{ margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+  .check{ list-style:none; padding-left:0 !important; margin:0; }
+  .check li{ margin-bottom:6px; color: var(--muted); font-size:14.5px; }
+  .check input{ accent-color: var(--accent); margin-right:8px; }
+  footer{
+    margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--border);
+    text-align:center; font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+
+  @media (max-width: 560px){
+    .step{ grid-template-columns: 1fr; gap: 10px; }
+    .step::before{ display:none; }
+    .num{ width:44px; height:44px; font-size:16px; }
+  }
+  @media print{
+    body{ background:#fff; padding: 0; }
+    .term-bar button{ display:none; }
+    .step, .panel, .term, .note{ break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Robótica · LEGO NXT · Java</div>
+  <h1>Programar el NXT en <span>Java</span> con leJOS y VS Code</h1>
+  <p class="subtitle">Instalación en Windows 11 (Ceibalita), conexión por Bluetooth, primer programa y herramientas útiles. Incluye cómo instalar el firmware leJOS en un NXT que todavía tiene el firmware de LEGO.</p>
+</header>
+
+<div class="panel">
+  <p class="panel-title">Qué se necesita</p>
+  <ul>
+    <li>Un LEGO NXT con pilas o batería bien cargadas.</li>
+    <li>Cable USB del NXT (solo para instalar el firmware leJOS, si el brick no lo tiene).</li>
+    <li>Computadora con Windows 11 y <strong>Bluetooth</strong> (las Ceibalitas lo tienen), con permisos de administrador para instalar.</li>
+    <li>VS Code con la extensión <strong>Extension Pack for Java</strong> (Microsoft).</li>
+  </ul>
+</div>
+
+<div class="panel">
+  <p class="panel-title">Antes de empezar: tres datos sobre leJOS NXJ</p>
+  <ul>
+    <li>Las herramientas de leJOS NXJ para Windows son de <strong>32 bits</strong>: necesitan un JDK 8 de 32 bits. Con un JDK de 64 bits no funcionan.</li>
+    <li>El lenguaje es Java estilo versión 5/6: <strong>no</strong> se pueden usar lambdas, <code>var</code>, streams ni muchas clases modernas de Java.</li>
+    <li>La conexión por <strong>USB</strong> depende de un driver de LEGO muy antiguo que suele fallar en Windows 11. Esta guía usa <strong>Bluetooth</strong>, que funciona sin drivers extra.</li>
+  </ul>
+</div>
+
+<h3 class="section-title">Instalación</h3>
+
+<div class="step">
+  <div class="num">01</div>
+  <div class="content">
+    <h2>Comprobar qué Java hay instalado</h2>
+    <p>Este script de PowerShell lista todos los Java de la computadora e indica, para cada uno, si es de 32 o 64 bits y si es JDK o solo JRE.</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>$bases = "C:\Program Files (x86)", "C:\Program Files", "C:\Java"
+foreach ($base in $bases) {
+  if (Test-Path $base) {
+    Get-ChildItem $base -Recurse -Depth 4 -Filter java.exe -ErrorAction SilentlyContinue |
+      Where-Object { $_.FullName -notmatch '\\jdk[^\\]*\\jre\\' } |
+      ForEach-Object {
+        $ver  = (&amp; $_.FullName -version 2&gt;&amp;1) -join " "
+        $bits = if ($ver -match "64-Bit") { "64 bits" } else { "32 bits" }
+        $tipo = if (Test-Path (Join-Path $_.DirectoryName "javac.exe")) { "JDK" } else { "JRE" }
+        "{0} | {1} | {2}" -f $bits, $tipo, $_.FullName
+      }
+  }
+}</pre>
+    </div>
+    <ul>
+      <li>Si aparece una línea <strong>32 bits | JDK</strong> con Java 1.8, ya está el JDK necesario: saltar el paso 2 y, en el paso 3, elegir esa carpeta.</li>
+      <li>Un <strong>JRE</strong> de 32 bits no alcanza (no tiene <code>javac</code>). El que está en <code>OpenRobertaNXT\java</code> pertenece al programa USB de Open Roberta: no usarlo ni modificarlo.</li>
+      <li>Los JDK de 64 bits (17, 21) pueden quedar instalados: no interfieren.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step">
+  <div class="num">02</div>
+  <div class="content">
+    <h2>Instalar un JDK 8 de 32 bits</h2>
+    <p>Entrar a <a href="https://adoptium.net/temurin/releases/?version=8&amp;os=windows&amp;arch=x86">adoptium.net</a> y elegir versión <strong>8 - LTS</strong>, sistema <strong>Windows</strong> y arquitectura <strong>x86</strong>.</p>
+    <span class="badge warn">Aviso esperado</span>
+    <p>La página muestra <strong>Unsupported Platform</strong>: Windows de 32 bits ya no recibe actualizaciones de seguridad. Para este uso el riesgo es muy bajo, porque ese JDK solo lo usan las herramientas de leJOS. Hacer clic en <strong>Show downloads anyway</strong>, dejar seleccionado <strong>JDK</strong> y descargar el <code>.msi</code>.</p>
+    <p>En el instalador, cambiar la ubicación a:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">ubicación</span><button type="button">Copiar</button></div>
+      <pre>C:\Java\jdk8-32\</pre>
+    </div>
+    <p>En la misma pantalla, ajustar las opciones (clic en el ícono de cada una):</p>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Opción</th><th>Elegir</th><th>Motivo</th></tr>
+      <tr><td>Añadir al PATH</td><td>No disponible ✗</td><td>Evita que <code>java</code> en la terminal abra este JDK en lugar del 17 o 21.</td></tr>
+      <tr><td>Asociar .jar</td><td>No disponible ✗</td><td>Los <code>.jar</code> se siguen abriendo con el Java moderno.</td></tr>
+      <tr><td>Establecer la variable JAVA_HOME</td><td>No disponible ✗</td><td>No cambia la configuración de Java Web.</td></tr>
+      <tr><td>Claves de registro JavaSoft</td><td>Se instalará ✓</td><td>El instalador de leJOS encuentra el JDK solo. El aviso sobre <code>javapath</code> afecta solo al Java de Oracle.</td></tr>
+    </table>
+    </div>
+    <p>Al terminar, verificar en PowerShell:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>&amp; "C:\Java\jdk8-32\bin\javac.exe" -version    <span class="cm"># debe mostrar javac 1.8.0_...</span></pre>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="num">03</div>
+  <div class="content">
+    <h2>Instalar leJOS NXJ 0.9.1beta-3</h2>
+    <span class="badge warn">Cuidado al descargar</span>
+    <p>En SourceForge, el botón verde <strong>Download Latest Version</strong> descarga leJOS para <strong>EV3</strong>, que no sirve para el NXT. Usar este enlace directo:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">enlace de descarga</span><button type="button">Copiar</button></div>
+      <pre>https://sourceforge.net/projects/lejos/files/lejos-NXJ/0.9.1beta/leJOS_NXJ_0.9.1beta-3_win32_setup.exe/download</pre>
+    </div>
+    <p>Comprobar que el archivo descargado se llame <code>leJOS_NXJ_0.9.1beta-3_win32_setup.exe</code> y pese unos <strong>21 MB</strong> (el de EV3 pesa unos 27 MB). También se encuentra en el release <code>instaladores-nxt</code> del repositorio <a href="https://github.com/Material-Robotica/openRoberta-NXT/releases">Material-Robotica/openRoberta-NXT</a>.</p>
+    <ol>
+      <li>Ejecutar como administrador. Si aparece SmartScreen: <strong>Más información → Ejecutar de todas formas</strong>.</li>
+      <li>En <strong>Select a Java Development Kit</strong>, seleccionar la carpeta <code>C:\Java\jdk8-32</code> (la carpeta raíz, no <code>bin</code>).</li>
+      <li>Dejar la carpeta de instalación por defecto: <code>C:\Program Files (x86)\leJOS NXJ</code>.</li>
+      <li>En <strong>Select Components</strong>, marcar también <strong>Sample and Example Projects</strong> (ejemplos útiles como referencia). Dejar marcada la documentación.</li>
+      <li>Al final se abre <strong>NXJ Flash</strong>. Si el NXT ya tiene leJOS, <strong>cerrar la ventana sin flashear</strong>: flashear borra todos los programas del brick. Si no lo tiene, cerrarla igual y seguir el paso 5.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="step">
+  <div class="num">04</div>
+  <div class="content">
+    <h2>Verificar las variables de entorno</h2>
+    <p>Cerrar todas las terminales, abrir una PowerShell nueva y ejecutar:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>$env:NXJ_HOME               <span class="cm"># C:\Program Files (x86)\leJOS NXJ</span>
+$env:LEJOS_NXT_JAVA_HOME    <span class="cm"># C:\Java\jdk8-32</span>
+nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
+    </div>
+    <p>El instalador crea estas variables. <code>LEJOS_NXT_JAVA_HOME</code> hace que leJOS use el JDK de 32 bits aunque <code>JAVA_HOME</code> apunte a otro JDK. Si alguna sale vacía, crearla en <strong>Editar las variables de entorno del sistema</strong>.</p>
+    <span class="badge opt">Alternativa</span>
+    <p>Si no se pueden crear variables del sistema (por ejemplo, sin permisos de administrador), se pueden definir solo para la terminal de VS Code, agregando esto al <code>settings.json</code> del proyecto (paso 7):</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">fragmento de settings.json</span><button type="button">Copiar</button></div>
+      <pre>"terminal.integrated.env.windows": {
+  "NXJ_HOME": "C:\\Program Files (x86)\\leJOS NXJ",
+  "LEJOS_NXT_JAVA_HOME": "C:\\Java\\jdk8-32",
+  "PATH": "C:\\Program Files (x86)\\leJOS NXJ\\bin;${env:PATH}"
+}</pre>
+    </div>
+  </div>
+</div>
+
+<h3 class="section-title">Firmware leJOS en el NXT</h3>
+
+<div class="step">
+  <div class="num">05</div>
+  <div class="content">
+    <h2>Instalar leJOS en el NXT (si no lo tiene)</h2>
+    <p>Encender el NXT y mirar la pantalla. Si aparece el menú de leJOS (con opciones como <strong>Files</strong>, <strong>Bluetooth</strong>, <strong>System</strong>), ya tiene el firmware: pasar al paso 6. Si aparece el menú original de LEGO (<strong>My Files</strong>, <strong>NXT Program</strong>, <strong>View</strong>…), hay que instalarlo.</p>
+
+    <span class="badge warn">Antes de empezar</span>
+    <ul>
+      <li>Instalar el firmware leJOS <strong>borra todos los programas y archivos</strong> guardados en el NXT.</li>
+      <li>Un NXT con leJOS no funciona con Open Roberta ni con el software de LEGO. Para volver a usarlo allí hay que reinstalar el firmware de LEGO desde el software LEGO MINDSTORMS NXT.</li>
+      <li>Usar pilas nuevas o la batería recién cargada: si el NXT se apaga durante el proceso, hay que repetirlo.</li>
+      <li>El firmware se instala <strong>solo por USB</strong> y necesita el driver <strong>Fantom</strong> (incluye el driver de actualización de firmware de LEGO). Está en el release <code>instaladores-nxt</code> del repositorio <a href="https://github.com/Material-Robotica/openRoberta-NXT/releases">Material-Robotica/openRoberta-NXT</a>.</li>
+    </ul>
+
+    <ol>
+      <li>Conectar el NXT por USB y encenderlo.</li>
+      <li>En PowerShell, abrir el programa de instalación del firmware:</li>
+    </ol>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>nxjflashg</pre>
+    </div>
+    <ol start="3">
+      <li>En la ventana <strong>Install leJOS NXJ Firmware</strong>, hacer clic en <strong>Flash leJOS firmware</strong> y aceptar las confirmaciones.</li>
+      <li>Si el programa pide poner el NXT en <strong>modo de actualización de firmware</strong>: con un clip, presionar el botón de reset que está dentro del orificio de la parte trasera del NXT, junto al puerto USB, durante <strong>más de 4 segundos</strong>. La pantalla queda en blanco y el NXT emite un <strong>tictac</strong> suave: eso indica que está en modo de actualización.</li>
+      <li>Esperar a que la barra de progreso llegue al 100 %. El NXT se reinicia solo y muestra el logo y el menú de leJOS.</li>
+    </ol>
+
+    <p>Después de instalarlo, preparar el NXT para el Bluetooth del paso 6:</p>
+    <ul>
+      <li>En el menú <strong>Bluetooth</strong>, dejar <strong>Power</strong> encendido y <strong>Visibility</strong> activada.</li>
+      <li>El PIN por defecto es <strong>1234</strong>.</li>
+    </ul>
+
+    <span class="badge warn">Si el USB no funciona</span>
+    <p>Si al ejecutar <code>nxjflashg</code> aparece el error <code>cannot load library ... jfantom.dll</code>, Windows 11 está bloqueando el driver Fantom (ver la sección «Usar USB en lugar de Bluetooth»). Como el firmware se instala una sola vez por brick, las opciones son:</p>
+    <ul>
+      <li>Hacer la instalación en otra computadora donde el USB del NXT funcione (por ejemplo, con Windows 10) y después volver a la Ceibalita para programar por Bluetooth.</li>
+      <li>Desactivar temporalmente la <strong>Integridad de memoria</strong> (Seguridad de Windows → Seguridad del dispositivo → Aislamiento del núcleo), reiniciar, instalar el firmware y <strong>volver a activarla</strong> al terminar, con otro reinicio.</li>
+    </ul>
+
+    <span class="badge ok">Si algo sale mal</span>
+    <p>Si el proceso se corta (cable desconectado, pilas agotadas), el NXT puede quedar con la pantalla en blanco haciendo tictac. No está dañado: el modo de actualización está grabado de fábrica y no se borra. Volver a ejecutar <code>nxjflashg</code> y repetir la instalación.</p>
+  </div>
+</div>
+
+<h3 class="section-title">Conexión por Bluetooth</h3>
+
+<div class="step">
+  <div class="num">06</div>
+  <div class="content">
+    <h2>Emparejar el NXT con la computadora</h2>
+    <ol>
+      <li>Encender el NXT y, en el menú <strong>Bluetooth</strong> de leJOS, verificar que esté encendido y visible.</li>
+      <li>En PowerShell, ejecutar <code>nxjbrowse</code>.</li>
+    </ol>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>nxjbrowse</pre>
+    </div>
+    <p>Primero aparece un error <code>Failed to load USB comms driver</code>: es <strong>esperable</strong> si no hay driver USB y puede ignorarse. Después leJOS busca por Bluetooth y abre la ventana <strong>NXJ File Browser</strong> con una fila <code>NXT | Bluetooth | ... | DISCONNECTED</code>.</p>
+    <ol start="3">
+      <li>Seleccionar la fila y hacer clic en <strong>Connect</strong>.</li>
+      <li>Windows abre <strong>Emparejar el dispositivo</strong>: usar el PIN <strong>1234</strong>. Puede figurar como «Dispositivo desconocido»; no es un problema.</li>
+      <li>Volver a hacer clic en <strong>Connect</strong>. Se abre la lista de archivos del NXT (vacía si no tiene programas).</li>
+      <li><strong>Cerrar la ventana del File Browser.</strong> Mientras está abierta ocupa la conexión y no se pueden subir programas.</li>
+    </ol>
+    <span class="badge opt">Recomendado</span>
+    <p>Con <strong>Set Name</strong> se le puede poner un nombre al NXT (por ejemplo, <code>NXT-Java</code>) para distinguirlo de otros NXT cercanos. El emparejamiento se hace una sola vez por computadora.</p>
+  </div>
+</div>
+
+<h3 class="section-title">Proyecto en VS Code</h3>
+
+<div class="step">
+  <div class="num">07</div>
+  <div class="content">
+    <h2>Crear el proyecto con un script</h2>
+    <p>Este script crea la carpeta <code>Documentos\nxt-hola</code> con su estructura y archivos, y la abre en VS Code. Copiarlo completo, pegarlo en PowerShell y presionar Enter.</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>$base = "$env:USERPROFILE\Documents\nxt-hola"
+New-Item -ItemType Directory -Force -Path "$base\.vscode", "$base\nxt-bin", "$base\src" | Out-Null
+
+$settings = @'
+{
+  "java.project.sourcePaths": ["src"],
+  "java.project.referencedLibraries": [
+    "C:/Program Files (x86)/leJOS NXJ/lib/nxt/classes.jar"
+  ]
+}
+'@
+
+$tasks = @'
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "NXT: Compilar",
+      "type": "shell",
+      "command": "nxjc -d nxt-bin -sourcepath src \"${file}\"",
+      "problemMatcher": []
+    },
+    {
+      "label": "NXT: Subir y ejecutar",
+      "type": "shell",
+      "command": "nxj -b -r -cp nxt-bin ${fileBasenameNoExtension}",
+      "dependsOn": "NXT: Compilar",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "NXT: Solo subir",
+      "type": "shell",
+      "command": "nxj -b -cp nxt-bin ${fileBasenameNoExtension}",
+      "dependsOn": "NXT: Compilar",
+      "problemMatcher": []
+    }
+  ]
+}
+'@
+
+$hola = @'
+import lejos.nxt.Button;
+import lejos.nxt.LCD;
+import lejos.nxt.Motor;
+import lejos.nxt.Sound;
+
+public class HolaNXT {
+    public static void main(String[] args) {
+        LCD.drawString("Hola NXT!", 0, 0);
+        LCD.drawString("Pulsar boton", 0, 2);
+        Button.waitForAnyPress();
+
+        Motor.B.setSpeed(360);
+        Motor.C.setSpeed(360);
+        Motor.B.rotate(720, true);
+        Motor.C.rotate(720);
+
+        Sound.beep();
+        LCD.clear();
+        LCD.drawString("Fin", 0, 0);
+        Button.waitForAnyPress();
+    }
+}
+'@
+
+[System.IO.File]::WriteAllText("$base\.vscode\settings.json", $settings)
+[System.IO.File]::WriteAllText("$base\.vscode\tasks.json", $tasks)
+[System.IO.File]::WriteAllText("$base\src\HolaNXT.java", $hola)
+
+code $base</pre>
+    </div>
+    <p>Si <code>code</code> no se reconoce como comando, abrir VS Code y usar <strong>Archivo → Abrir carpeta → Documentos → nxt-hola</strong>. Si VS Code pregunta si se confía en los autores de la carpeta, responder <strong>Sí</strong>.</p>
+    <p>Estructura que queda creada:</p>
+    <div class="panel"><div class="tree">nxt-hola/
+├── .vscode/
+│   ├── settings.json   → autocompletado con la biblioteca de leJOS
+│   └── tasks.json      → compilar, subir y ejecutar
+├── nxt-bin/            → clases compiladas por leJOS
+└── src/
+    └── HolaNXT.java</div></div>
+    <span class="badge warn">Importante</span>
+    <p>Los archivos se guardan con <code>WriteAllText</code> para que queden en UTF-8 <strong>sin BOM</strong>. Con <code>Set-Content</code>, el compilador de Java 8 da el error <em>illegal character '\ufeff'</em>.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="num">08</div>
+  <div class="content">
+    <h2>Subir y ejecutar el primer programa</h2>
+    <ol>
+      <li>Conectar los motores en los puertos <strong>B</strong> (izquierdo) y <strong>C</strong> (derecho).</li>
+      <li>Encender el NXT y comprobar que el File Browser esté cerrado.</li>
+      <li>Abrir <code>src/HolaNXT.java</code> en el editor y presionar <strong>Ctrl + Shift + B</strong>.</li>
+    </ol>
+    <p>La terminal de VS Code muestra la compilación, la conexión por Bluetooth y la subida. En la pantalla del NXT aparece «Hola NXT!». Al pulsar un botón, el robot avanza dos vueltas de rueda, emite un pitido y muestra «Fin».</p>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Opción de nxj</th><th>Significado</th></tr>
+      <tr><td><code>-b</code></td><td>Conectar por Bluetooth (<code>-u</code> sería por USB).</td></tr>
+      <tr><td><code>-r</code></td><td>Ejecutar el programa apenas termina de subirse.</td></tr>
+      <tr><td><code>-cp nxt-bin</code></td><td>Carpeta donde están las clases compiladas.</td></tr>
+      <tr><td><code>-n NXT-Java</code></td><td>Opcional: conectar solo con el NXT de ese nombre.</td></tr>
+    </table>
+    </div>
+    <span class="badge opt">Instalar sin ejecutar</span>
+    <p>Para dejar un programa terminado guardado en el NXT sin que arranque, usar <strong>Terminal → Ejecutar tarea → NXT: Solo subir</strong>. Después se ejecuta desde el NXT, en el menú <strong>Files</strong>.</p>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Tarea</th><th>Cuándo usarla</th></tr>
+      <tr><td><strong>Ctrl + Shift + B</strong> (Subir y ejecutar)</td><td>Durante el desarrollo, para probar rápido.</td></tr>
+      <tr><td><strong>NXT: Solo subir</strong></td><td>Con el programa terminado, para dejarlo instalado en el NXT.</td></tr>
+    </table>
+    </div>
+    <span class="badge warn">Importante</span>
+    <p>No usar el botón <strong>Run</strong> de VS Code: compila con un Java moderno que el NXT no entiende. Compilar y subir siempre con <strong>Ctrl + Shift + B</strong>.</p>
+    <p>Para cada programa nuevo, crear un archivo <code>.java</code> en <code>src</code> con su propio <code>main</code>, tenerlo abierto en el editor y presionar <strong>Ctrl + Shift + B</strong>. La pantalla del NXT tiene 16 columnas y 8 filas, y no admite tildes ni eñes.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="num">09</div>
+  <div class="content">
+    <h2>Segundo programa: explorador con sensor ultrasónico</h2>
+    <p><code>DifferentialPilot</code> mueve el robot en centímetros y grados en lugar de vueltas de motor. Conectar el sensor ultrasónico en el puerto <strong>4</strong>. El robot avanza; si detecta un obstáculo a menos de 25 cm, retrocede y gira. Se detiene con el botón gris oscuro (ESCAPE).</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Explorador.java</span><button type="button">Copiar</button></div>
+      <pre><span class="kw">import</span> lejos.nxt.*;
+<span class="kw">import</span> lejos.robotics.navigation.DifferentialPilot;
+
+<span class="kw">public class</span> <span class="ty">Explorador</span> {
+    <span class="kw">public static void</span> main(<span class="ty">String</span>[] args) {
+        <span class="cm">// diámetro de rueda y distancia entre ruedas, en cm (medir el robot)</span>
+        <span class="ty">DifferentialPilot</span> piloto =
+            <span class="kw">new</span> <span class="ty">DifferentialPilot</span>(<span class="nu">5.6</span>, <span class="nu">11.2</span>, <span class="ty">Motor</span>.B, <span class="ty">Motor</span>.C);
+        <span class="ty">UltrasonicSensor</span> sonar = <span class="kw">new</span> <span class="ty">UltrasonicSensor</span>(<span class="ty">SensorPort</span>.S4);
+
+        piloto.setTravelSpeed(<span class="nu">15</span>);       <span class="cm">// cm por segundo</span>
+        <span class="ty">LCD</span>.drawString(<span class="st">"Explorador"</span>, <span class="nu">0</span>, <span class="nu">0</span>);
+        <span class="ty">Button</span>.waitForAnyPress();
+
+        <span class="kw">while</span> (!<span class="ty">Button</span>.ESCAPE.isDown()) {
+            <span class="kw">if</span> (sonar.getDistance() &lt; <span class="nu">25</span>) {
+                piloto.stop();
+                <span class="ty">Sound</span>.beep();
+                piloto.travel(-<span class="nu">10</span>);       <span class="cm">// retrocede 10 cm</span>
+                piloto.rotate(<span class="nu">90</span>);        <span class="cm">// gira 90 grados</span>
+            } <span class="kw">else</span> {
+                piloto.forward();
+            }
+        }
+        piloto.stop();
+    }
+}</pre>
+    </div>
+    <p>Crear el archivo en <code>src</code>, abrirlo en el editor y presionar <strong>Ctrl + Shift + B</strong>.</p>
+  </div>
+</div>
+
+
+<div class="step">
+  <div class="num">10</div>
+  <div class="content">
+    <h2>Clase auxiliar con métodos propios</h2>
+    <p>Una clase auxiliar agrupa movimientos frecuentes en métodos con nombres simples. Así se puede empezar usando <code>Robot.avanzar()</code> y más adelante analizar cómo está hecho cada método.</p>
+    <span class="badge warn">Nombre de la clase</span>
+    <p>No llamarla <code>NXT</code>: leJOS ya tiene una clase <code>lejos.nxt.NXT</code> y el nombre se presta a confusión.</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Robot.java</span><button type="button">Copiar</button></div>
+      <pre><span class="kw">import</span> lejos.nxt.Button;
+<span class="kw">import</span> lejos.nxt.LCD;
+<span class="kw">import</span> lejos.nxt.Motor;
+
+<span class="kw">public class</span> <span class="ty">Robot</span> {
+
+    <span class="kw">public static void</span> velocidad(<span class="kw">int</span> gradosPorSegundo) {
+        <span class="ty">Motor</span>.B.setSpeed(gradosPorSegundo);
+        <span class="ty">Motor</span>.C.setSpeed(gradosPorSegundo);
+    }
+
+    <span class="cm">// gradosRueda: cuánto gira cada rueda (360 = una vuelta)</span>
+    <span class="kw">public static void</span> avanzar(<span class="kw">int</span> gradosRueda) {
+        <span class="ty">Motor</span>.B.rotate(gradosRueda, <span class="kw">true</span>);
+        <span class="ty">Motor</span>.C.rotate(gradosRueda);
+    }
+
+    <span class="kw">public static void</span> retroceder(<span class="kw">int</span> gradosRueda) {
+        avanzar(-gradosRueda);
+    }
+
+    <span class="cm">// las ruedas giran en sentidos opuestos: el robot gira en el lugar</span>
+    <span class="kw">public static void</span> girarDerecha(<span class="kw">int</span> gradosRueda) {
+        <span class="ty">Motor</span>.B.rotate(gradosRueda, <span class="kw">true</span>);
+        <span class="ty">Motor</span>.C.rotate(-gradosRueda);
+    }
+
+    <span class="kw">public static void</span> girarIzquierda(<span class="kw">int</span> gradosRueda) {
+        girarDerecha(-gradosRueda);
+    }
+
+    <span class="kw">public static void</span> mostrar(<span class="ty">String</span> texto, <span class="kw">int</span> fila) {
+        <span class="ty">LCD</span>.drawString(texto, <span class="nu">0</span>, fila);
+    }
+
+    <span class="kw">public static void</span> esperarBoton() {
+        <span class="ty">Button</span>.waitForAnyPress();
+    }
+}</pre>
+    </div>
+    <p>Un programa que usa la clase auxiliar:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">src/Cuadrado.java</span><button type="button">Copiar</button></div>
+      <pre><span class="kw">public class</span> <span class="ty">Cuadrado</span> {
+    <span class="kw">public static void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">Robot</span>.mostrar(<span class="st">"Cuadrado"</span>, <span class="nu">0</span>);
+        <span class="ty">Robot</span>.esperarBoton();
+        <span class="ty">Robot</span>.velocidad(<span class="nu">300</span>);
+
+        <span class="kw">for</span> (<span class="kw">int</span> lado = <span class="nu">1</span>; lado &lt;= <span class="nu">4</span>; lado++) {
+            <span class="ty">Robot</span>.avanzar(<span class="nu">720</span>);
+            <span class="ty">Robot</span>.girarDerecha(<span class="nu">180</span>);   <span class="cm">// ajustar hasta lograr 90 grados</span>
+        }
+        <span class="ty">Robot</span>.mostrar(<span class="st">"Fin"</span>, <span class="nu">2</span>);
+        <span class="ty">Robot</span>.esperarBoton();
+    }
+}</pre>
+    </div>
+    <p>Guardar los dos archivos en <code>src</code>, abrir <code>Cuadrado.java</code> (el que tiene el <code>main</code>) y presionar <strong>Ctrl + Shift + B</strong>. No hace falta compilar <code>Robot.java</code> aparte: gracias a <code>-sourcepath src</code>, el compilador la encuentra y la compila sola.</p>
+  </div>
+</div>
+
+<h3 class="section-title">Referencia rápida</h3>
+
+<div class="panel">
+  <p class="panel-title">Clases más usadas</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Clase</th><th>Para qué sirve</th></tr>
+    <tr><td><code>Motor.A / B / C</code></td><td><code>forward()</code>, <code>backward()</code>, <code>stop()</code>, <code>rotate(grados)</code>, <code>setSpeed(gr/s)</code>, <code>getTachoCount()</code></td></tr>
+    <tr><td><code>LCD</code></td><td><code>drawString()</code>, <code>drawInt()</code>, <code>clear()</code></td></tr>
+    <tr><td><code>Button</code></td><td><code>waitForAnyPress()</code>, <code>ENTER</code>, <code>ESCAPE</code>, <code>LEFT</code>, <code>RIGHT</code></td></tr>
+    <tr><td><code>Sound</code></td><td><code>beep()</code>, <code>playTone(frecuencia, ms)</code></td></tr>
+    <tr><td><code>TouchSensor</code></td><td><code>isPressed()</code></td></tr>
+    <tr><td><code>LightSensor</code></td><td><code>getLightValue()</code> (0 a 100)</td></tr>
+    <tr><td><code>UltrasonicSensor</code></td><td><code>getDistance()</code> en cm (255 = nada a la vista)</td></tr>
+    <tr><td><code>SoundSensor</code></td><td><code>readValue()</code></td></tr>
+    <tr><td><code>DifferentialPilot</code></td><td><code>travel(cm)</code>, <code>rotate(grados)</code>, <code>arc()</code>, <code>forward()</code>, <code>stop()</code></td></tr>
+    <tr><td><code>Delay</code> (lejos.util)</td><td><code>msDelay(ms)</code> para pausas</td></tr>
+  </table>
+  </div>
+  <p>Para programas con varios comportamientos (evitar obstáculos, seguir línea, detenerse al tocar), leJOS incluye <code>lejos.robotics.subsumption</code>: cada comportamiento es una clase que implementa la interfaz <code>Behavior</code>, y un <code>Arbitrator</code> decide cuál actúa.</p>
+  <p>Los ejemplos instalados con leJOS están en <code>C:\Program Files (x86)\leJOS NXJ\samples</code> (o en la carpeta elegida durante la instalación).</p>
+</div>
+
+<div class="panel">
+  <p class="panel-title">Herramientas incluidas en leJOS NXJ</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Comando</th><th>Para qué sirve</th></tr>
+    <tr><td><code>nxjbrowse</code></td><td>Ver, ejecutar, borrar y renombrar programas del NXT.</td></tr>
+    <tr><td><code>nxjcontrol</code></td><td>Panel completo: archivos, motores, lecturas de sensores en vivo.</td></tr>
+    <tr><td><code>nxjconsole</code></td><td>Muestra en la PC lo que el programa escribe con <code>RConsole.println()</code>. Útil para depurar.</td></tr>
+    <tr><td><code>nxjflashg</code></td><td>Instalar o reinstalar el firmware leJOS (requiere USB y borra los programas).</td></tr>
+  </table>
+  </div>
+</div>
+
+<div class="panel">
+  <span class="badge opt">Opcional · conexión por USB</span>
+  <p class="panel-title">Usar USB en lugar de Bluetooth</p>
+  <p>Requiere el driver <strong>Fantom</strong> de LEGO (versión de 64 bits, disponible en el release <code>instaladores-nxt</code> del repositorio openRoberta-NXT), instalado como administrador y con reinicio. En el <code>tasks.json</code>, cambiar <code>-b</code> por <code>-u</code>.</p>
+  <p>En Windows 11 es frecuente que falle con el error <code>cannot load library ... jfantom.dll</code> / <em>Error en una rutina de inicialización de biblioteca de vínculos dinámicos (DLL)</em>, aunque el driver esté instalado. La causa más probable es la <strong>Integridad de memoria</strong> (Seguridad de Windows → Seguridad del dispositivo → Aislamiento del núcleo), que bloquea los componentes antiguos de National Instruments. Desactivarla reduce la seguridad del equipo, por lo que se recomienda usar Bluetooth.</p>
+</div>
+
+<div class="note">
+  <span class="badge warn">Problemas frecuentes</span>
+  <h2>Si algo no funciona</h2>
+  <dl>
+    <dt>«No NXT found» al subir</dt>
+    <dd>Revisar que el NXT esté encendido con el menú de leJOS, que tenga el Bluetooth encendido y visible, que esté emparejado (paso 6) y que la ventana del File Browser esté cerrada.</dd>
+
+    <dt>Se conecta a otro NXT</dt>
+    <dd>Ponerle nombre al NXT con <strong>Set Name</strong> en el File Browser y agregar <code>-n NOMBRE</code> al comando <code>nxj</code> del <code>tasks.json</code>.</dd>
+
+    <dt>«cannot find symbol» con Robot u otra clase propia</dt>
+    <dd>La clase auxiliar no está en la carpeta <code>src</code> o el nombre del archivo no coincide con el de la clase (<code>Robot.java</code> → <code>public class Robot</code>).</dd>
+
+    <dt>Error al subir: la clase no tiene main</dt>
+    <dd>Se presionó Ctrl + Shift + B con una clase auxiliar abierta. Abrir el archivo del programa (el que tiene <code>main</code>) y repetir.</dd>
+
+    <dt>Error de librería nativa o de 32 bits</dt>
+    <dd>leJOS está usando un JDK de 64 bits. Verificar que <code>LEJOS_NXT_JAVA_HOME</code> apunte a <code>C:\Java\jdk8-32</code> y abrir una terminal nueva.</dd>
+
+    <dt>«illegal character: '\ufeff'» al compilar</dt>
+    <dd>El archivo <code>.java</code> se guardó con BOM. En VS Code, hacer clic en la codificación de la barra inferior (<em>UTF-8 with BOM</em>) y elegir <strong>Guardar con codificación → UTF-8</strong>.</dd>
+
+    <dt>«Unsupported class version» al enlazar</dt>
+    <dd>Las clases se compilaron con un Java moderno (por ejemplo, con el botón Run de VS Code). Borrar el contenido de <code>nxt-bin</code> y volver a usar <strong>Ctrl + Shift + B</strong>.</dd>
+
+    <dt>«Class not found» al enlazar</dt>
+    <dd>El programa usa una clase de Java estándar que leJOS no incluye (por ejemplo, <code>String.format</code> o colecciones avanzadas). Reemplazarla por una alternativa simple.</dd>
+
+    <dt>El NXT se cuelga</dt>
+    <dd>Mantener presionados a la vez el botón naranja (ENTER) y el gris oscuro (ESCAPE) para reiniciarlo. Si no responde, quitar una pila unos segundos.</dd>
+
+    <dt>Memoria llena</dt>
+    <dd>Borrar programas viejos (archivos <code>.nxj</code>) desde el menú <strong>Files</strong> del NXT o con <code>nxjbrowse</code>.</dd>
+  </dl>
+</div>
+
+
+<div class="panel">
+  <p class="panel-title">Lista de verificación</p>
+  <ul class="check">
+    <li><label><input type="checkbox"> JDK 8 de 32 bits en <code>C:\Java\jdk8-32</code> (<code>javac 1.8</code>)</label></li>
+    <li><label><input type="checkbox"> leJOS NXJ 0.9.1beta-3 instalado</label></li>
+    <li><label><input type="checkbox"> <code>NXJ_HOME</code> y <code>LEJOS_NXT_JAVA_HOME</code> correctas</label></li>
+    <li><label><input type="checkbox"> NXT con firmware leJOS (paso 5, si hacía falta)</label></li>
+    <li><label><input type="checkbox"> Bluetooth del NXT encendido y visible</label></li>
+    <li><label><input type="checkbox"> NXT emparejado con la computadora (PIN 1234)</label></li>
+    <li><label><input type="checkbox"> VS Code con Extension Pack for Java</label></li>
+    <li><label><input type="checkbox"> Proyecto creado con <code>settings.json</code> y <code>tasks.json</code></label></li>
+    <li><label><input type="checkbox"> <code>HolaNXT</code> subido y ejecutado con Ctrl + Shift + B</label></li>
+    <li><label><input type="checkbox"> Clase auxiliar <code>Robot.java</code> funcionando con <code>Cuadrado.java</code></label></li>
+  </ul>
+</div>
+
+<footer>Material-Robotica · Prof. Elizabeth Izquierdo · LEGO NXT + leJOS NXJ 0.9.1</footer>
+
+</div>
+<script>
+  document.querySelectorAll('.term').forEach(function (term) {
+    var btn = term.querySelector('button');
+    var pre = term.querySelector('pre');
+    if (!btn || !pre) return;
+    btn.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        btn.textContent = 'Copiado';
+        setTimeout(function () { btn.textContent = 'Copiar'; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {});
+      }
+    });
+  });
+</script>
+</body>
+</html>
