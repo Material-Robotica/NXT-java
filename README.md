@@ -1,8 +1,6 @@
-# Programar el LEGO NXT
+# NXT-java
 
-Material de robótica para programar el LEGO MINDSTORMS NXT con Java (leJOS NXJ) y con Python (nxt-python).
-
-## Java con leJOS
+Material de robótica para programar el LEGO MINDSTORMS NXT en **Java** con leJOS NXJ.
 
 | Documento | Contenido |
 |---|---|
@@ -11,13 +9,9 @@ Material de robótica para programar el LEGO MINDSTORMS NXT con Java (leJOS NXJ)
 | [Programar el NXT en Java: primeros pasos](GuiaNXT-java-primeros-pasos.html) | Partes del NXT, pantalla, botones, motores, sensores, clase auxiliar, menús, navegación y comportamientos, con ejercicios. |
 | [Secuencia didáctica: misión de exploración planetaria](SecuenciaNXT-exploracion-planetaria.html) | 10 clases de 45 minutos con programas base, desafíos y rúbrica. |
 
-Instaladores (JDK 8 de 32 bits y leJOS NXJ 0.9.1beta-3): [release instaladores-nxt](https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt).
+## Instaladores
 
-## Python con nxt-python
-
-| Documento | Contenido |
-|---|---|
-| [Programar el NXT en Python con nxt-python](GuiaNXT-python.html) | Control del NXT desde Ubuntu sin cambiar el firmware de LEGO. *Pendiente de prueba.* |
+JDK 8 de 32 bits y leJOS NXJ 0.9.1beta-3: [release instaladores-nxt](https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt).
 
 ---
 Material-Robotica · Prof. Elizabeth Izquierdo
