@@ -131,6 +131,7 @@
   .panel p:last-child, .panel ul:last-child{ margin-bottom:0; }
   .panel-title{ font-family: var(--mono); font-size: 13px; font-weight:700; margin: 0 0 6px; }
 
+  .content p.sub{ font-family: var(--mono); font-size: 14.5px; font-weight:700; color: var(--text); margin: 26px 0 8px; }
   .tree{ font-family: var(--mono); font-size: 12.8px; color: var(--text); white-space: pre; overflow-x:auto; }
 
   table{ width:100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 14px; }
@@ -201,7 +202,7 @@
       <li value="5"><a href="#paso-5">Instalar VS Code y la extensión de Java</a></li>
     </ol></div>
     <div><p class="toc-sec">Firmware leJOS en el NXT</p><ol>
-      <li value="6"><a href="#paso-6">Instalar leJOS en el NXT (si no lo tiene)</a></li>
+      <li value="6"><a href="#paso-6">Instalar leJOS en el NXT desde Windows 11</a></li>
     </ol></div>
     <div><p class="toc-sec">Conexión por Bluetooth</p><ol>
       <li value="7"><a href="#paso-7">Emparejar el NXT con la computadora</a></li>
@@ -215,6 +216,7 @@
       <li><a href="#ref-clases">Clases más usadas</a></li>
       <li><a href="#ref-herramientas">Herramientas de leJOS NXJ</a></li>
       <li><a href="#usb">Usar USB en lugar de Bluetooth</a></li>
+      <li><a href="#diagnostico">Diagnóstico del USB (driver Fantom)</a></li>
       <li><a href="#problemas">Problemas frecuentes</a></li>
       <li><a href="#verificacion">Lista de verificación</a></li>
     </ul></div>
@@ -226,8 +228,8 @@
   <p>Esta guía es para Windows. Para computadoras con Ubuntu, ver <a href="GuiaNXT-lejos-linux.html">Programar el NXT en Java desde Linux</a>.</p>
   <ul>
     <li>Un LEGO NXT con pilas o batería bien cargadas.</li>
-    <li>Los instaladores del JDK 8 de 32 bits y de leJOS NXJ, disponibles en el release <a href="https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt"><code>instaladores-nxt</code></a> del repositorio NXT-java.</li>
-    <li>Cable USB del NXT (solo para instalar el firmware leJOS, si el brick no lo tiene).</li>
+    <li>Los instaladores del JDK 8 de 32 bits, de leJOS NXJ y del driver Fantom, disponibles en el release <a href="https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt"><code>instaladores-nxt</code></a> del repositorio NXT-java.</li>
+    <li>Cable USB del NXT y driver <strong>Fantom</strong> de LEGO (solo para instalar el firmware leJOS, si el brick no lo tiene; ver el paso 6).</li>
     <li>Computadora con Windows 11 y <strong>Bluetooth</strong> (las Ceibalitas lo tienen), con permisos de administrador para instalar.</li>
     <li>VS Code con la extensión <strong>Extension Pack for Java</strong> (si no está instalado, ver el paso 5).</li>
   </ul>
@@ -238,7 +240,7 @@
   <ul>
     <li>Las herramientas de leJOS NXJ para Windows son de <strong>32 bits</strong>: necesitan un JDK 8 de 32 bits. Con un JDK de 64 bits no funcionan.</li>
     <li>El lenguaje es Java estilo versión 5/6: <strong>no</strong> se pueden usar lambdas, <code>var</code>, streams ni muchas clases modernas de Java.</li>
-    <li>La conexión por <strong>USB</strong> depende de un driver de LEGO muy antiguo que suele fallar en Windows 11. Esta guía usa <strong>Bluetooth</strong>, que funciona sin drivers extra.</li>
+    <li>La conexión por <strong>USB</strong> depende de un driver de LEGO muy antiguo (Fantom): en Windows 11 solo funciona con la <strong>Integridad de memoria desactivada</strong>. Hace falta una vez, para instalar el firmware (paso 6). Para programar, esta guía usa <strong>Bluetooth</strong>, que funciona sin drivers extra.</li>
   </ul>
 </div>
 
@@ -395,7 +397,7 @@ nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
 <div class="step" id="paso-6">
   <div class="num">06</div>
   <div class="content">
-    <h2>Instalar leJOS en el NXT (si no lo tiene)</h2>
+    <h2>Instalar leJOS en el NXT desde Windows 11 (si no lo tiene)</h2>
     <p>Encender el NXT y mirar la pantalla. Si aparece el menú de leJOS (con opciones como <strong>Files</strong>, <strong>Bluetooth</strong>, <strong>System</strong>), ya tiene el firmware: pasar al paso 7. Si aparece el menú original de LEGO (<strong>My Files</strong>, <strong>NXT Program</strong>, <strong>View</strong>…), hay que instalarlo.</p>
 
     <span class="badge warn">Antes de empezar</span>
@@ -403,38 +405,130 @@ nxjc -version               <span class="cm"># javac 1.8.0_...</span></pre>
       <li>Instalar el firmware leJOS <strong>borra todos los programas y archivos</strong> guardados en el NXT.</li>
       <li>Un NXT con leJOS no funciona con Open Roberta ni con el software de LEGO. Para volver a usarlo allí hay que reinstalar el firmware de LEGO desde el software LEGO MINDSTORMS NXT.</li>
       <li>Usar pilas nuevas o la batería recién cargada: si el NXT se apaga durante el proceso, hay que repetirlo.</li>
-      <li>El firmware se instala <strong>solo por USB</strong> y necesita el driver <strong>Fantom</strong> (incluye el driver de actualización de firmware de LEGO). Está en el release <code>instaladores-nxt</code> del repositorio <a href="https://github.com/Material-Robotica/openRoberta-NXT/releases">Material-Robotica/openRoberta-NXT</a>.</li>
+      <li>El firmware se instala <strong>solo por USB</strong>. Alcanza con prepararlo en <strong>una</strong> computadora: después, en esa misma computadora se flashean todos los NXT.</li>
     </ul>
 
+    <div class="panel">
+      <p class="panel-title">Por qué falla en Windows 11 y qué hace falta</p>
+      <p>leJOS se comunica por USB con el driver <strong>Fantom</strong> de LEGO, que es de 2011. En Windows 11 tienen que cumplirse <strong>tres condiciones</strong> a la vez. Si falta cualquiera, aparece el mismo error: <code>Cannot load NXTComm driver</code>.</p>
+      <div class="table-wrap">
+      <table>
+        <tr><th>Condición</th><th>Motivo</th><th>Paso</th></tr>
+        <tr><td><strong>Integridad de memoria</strong> desactivada</td><td>Windows 11 bloquea los componentes antiguos de National Instruments que usa el driver.</td><td>6.1</td></tr>
+        <tr><td>Driver Fantom completo, <strong>incluida la parte «Driver Support»</strong></td><td>Sin ella, <code>fantom.dll</code> no puede arrancar. Suele quedar sin instalar (error 2711).</td><td>6.2</td></tr>
+        <tr><td>leJOS usando el <strong>JDK 8 de 32 bits</strong></td><td>La librería <code>jfantom.dll</code> de leJOS es de 32 bits.</td><td>6.3</td></tr>
+      </table>
+      </div>
+    </div>
+
+    <p class="sub">6.1 · Desactivar la Integridad de memoria</p>
+    <p>Hacerlo <strong>antes</strong> de instalar el driver Fantom: si el driver se instala con la Integridad de memoria activada, la parte de National Instruments queda bloqueada y hay que reinstalarlo. Abrir la pantalla directamente desde PowerShell:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>Start-Process "windowsdefender://coreisolation"</pre>
+    </div>
     <ol>
-      <li>Conectar el NXT por USB y encenderlo.</li>
-      <li>En PowerShell, abrir el programa de instalación del firmware:</li>
+      <li>Pasar el interruptor <strong>Integridad de memoria</strong> a <strong>Desactivado</strong> y aceptar el permiso de administrador.</li>
+      <li><strong>Reiniciar</strong> la computadora (obligatorio para que el cambio tenga efecto).</li>
+    </ol>
+    <p>También se llega por <strong>Inicio → Seguridad de Windows → Seguridad del dispositivo → Detalles del aislamiento del núcleo</strong>. Si el interruptor está en gris, la computadora está administrada por la institución: usar otra computadora o la opción de Ubuntu (ver «Si el USB no funciona», al final de este paso).</p>
+
+    <p class="sub">6.2 · Instalar el driver Fantom completo</p>
+    <p>Descargar <code>NXT_Fantom_Drivers_v120.zip</code> desde el release <a href="https://github.com/Material-Robotica/NXT-java/releases/tag/instaladores-nxt"><code>instaladores-nxt</code> del repositorio Material-Robotica/NXT-java</a>, en la sección <strong>Assets</strong>. Descomprimirlo en <code>Descargas</code> (clic derecho → <strong>Extraer todo</strong>). Los comandos de este paso buscan el instalador dentro de <code>Descargas</code>.</p>
+    <p><strong>Si el driver ya estaba instalado</strong> de antes y el flasheo falla, desinstalarlo primero: <strong>Configuración → Aplicaciones → Aplicaciones instaladas</strong>, buscar <strong>LEGO MINDSTORMS NXT x64 Driver</strong> (y también <em>Driver Support</em>, <em>NI-VISA</em> o <em>National Instruments</em>, si aparecen) → <strong>⋯ → Desinstalar</strong>. Después reiniciar.</p>
+    <ol>
+      <li>Con el NXT <strong>desconectado</strong>, abrir PowerShell como administrador (clic derecho en PowerShell → <strong>Ejecutar como administrador</strong>).</li>
+      <li>Ejecutar este script: busca el <code>setup.exe</code> del driver dentro de <code>Descargas</code>, muestra su ruta y lo abre.</li>
+    </ol>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell (administrador)</span><button type="button">Copiar</button></div>
+      <pre>$setup = Get-ChildItem "$env:USERPROFILE\Downloads" -Recurse -Filter setup.exe -ErrorAction SilentlyContinue |
+  Where-Object { $_.FullName -match "Fantom" } | Select-Object -First 1
+$setup.FullName
+&amp; $setup.FullName</pre>
+    </div>
+    <ol start="3">
+      <li>En <strong>Features</strong> deben quedar marcadas las dos opciones: <strong>LEGO MINDSTORMS NXT x64 Driver</strong> y <strong>LEGO MINDSTORMS NXT x64 Driver Support</strong>. Seguir el asistente.</li>
+    </ol>
+    <span class="badge warn">Si aparece «Internal Error 2711»</span>
+    <p>Es frecuente que la parte <strong>Driver Support</strong> falle con el mensaje <em>Internal Error 2711. LegoDriverSupp.VSALG64SUPP.1.2</em>. Responder <strong>Sí</strong> para que termine el resto y después instalar el Driver Support directamente desde su archivo <code>.msi</code> con este script (en la misma PowerShell de administrador):</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell (administrador)</span><button type="button">Copiar</button></div>
+      <pre>$msi = Get-ChildItem "$env:USERPROFILE\Downloads" -Recurse -Filter *.msi -ErrorAction SilentlyContinue |
+  Where-Object { $_.FullName -match "Fantom" -and $_.FullName -match "Supp" -and $_.FullName -match "64" } |
+  Select-Object -First 1
+"Instalando: $($msi.FullName)"
+Start-Process msiexec -ArgumentList "/i `"$($msi.FullName)`"" -Wait</pre>
+    </div>
+    <p>Se abre el asistente <strong>LEGO MINDSTORMS NXT x64 Driver Support Setup</strong> (con el logo de National Instruments): pulsar <strong>Next</strong>, aceptar la licencia y dejar las opciones por defecto. Al terminar, <strong>reiniciar</strong>.</p>
+
+    <p class="sub">6.3 · Comprobar que leJOS usa el Java de 32 bits</p>
+    <p>En una PowerShell nueva (no hace falta que sea de administrador):</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>$env:LEJOS_NXT_JAVA_HOME                          <span class="cm"># C:\Java\jdk8-32</span>
+&amp; "$env:LEJOS_NXT_JAVA_HOME\bin\java.exe" -version  <span class="cm"># 1.8.0_... Client VM (sin "64-Bit")</span></pre>
+    </div>
+    <p>Que <code>java -version</code> a secas muestre Java 17 o 21 de 64 bits es <strong>normal</strong>: leJOS no usa ese Java, sino el de <code>LEJOS_NXT_JAVA_HOME</code>. Si la variable sale vacía, crearla para el usuario (no requiere permisos de administrador) y abrir una PowerShell nueva:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+      <pre>[Environment]::SetEnvironmentVariable("LEJOS_NXT_JAVA_HOME", "C:\Java\jdk8-32", "User")</pre>
+    </div>
+    <p>Con <code>"Machine"</code> en lugar de <code>"User"</code> la variable queda para todos los usuarios, pero requiere PowerShell de administrador (si no, da <em>Acceso denegado al Registro</em>).</p>
+
+    <p class="sub">6.4 · Instalar el firmware con nxjflash</p>
+    <ol>
+      <li>Conectar el NXT por USB y encenderlo. Puede estar con el menú de LEGO: no hace falta ponerlo antes en modo de actualización.</li>
+      <li>En PowerShell, ejecutar la versión de consola del instalador de firmware. Muestra mensajes de error más detallados que la ventana gráfica <code>nxjflashg</code>.</li>
     </ol>
     <div class="term">
       <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
-      <pre>nxjflashg</pre>
+      <pre>&amp; "C:\Program Files (x86)\leJOS NXJ\bin\nxjflash.bat"</pre>
     </div>
     <ol start="3">
-      <li>En la ventana <strong>Install leJOS NXJ Firmware</strong>, hacer clic en <strong>Flash leJOS firmware</strong> y aceptar las confirmaciones.</li>
-      <li>Si el programa pide poner el NXT en <strong>modo de actualización de firmware</strong>: con un clip, presionar el botón de reset que está dentro del orificio de la parte trasera del NXT, junto al puerto USB, durante <strong>más de 4 segundos</strong>. La pantalla queda en blanco y el NXT emite un <strong>tictac</strong> suave: eso indica que está en modo de actualización.</li>
-      <li>Esperar a que la barra de progreso llegue al 100 %. El NXT se reinicia solo y muestra el logo y el menú de leJOS.</li>
+      <li>El programa encuentra el NXT y pregunta cuál actualizar: escribir <strong>1</strong> y presionar <strong>Enter</strong>. Pasa el NXT a modo de actualización por su cuenta, escribe el firmware y lo verifica.</li>
     </ol>
+    <div class="term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">salida esperada (resumen)</span></div>
+      <pre>Locating device in firmware update mode.
+No devices in firmware update mode were found.
+Searching for other NXT devices.
+The following NXT devices have been found:
+  1:  NXT  001653XXXXXX
+Device number to update (0 to exit): <span class="nu">1</span>
+Attempting to reboot the device.
+Found NXT: %%NXT-SAMBA%% 1
+Opened device in firmware update mode.
+Writing firmware image.
+Verifying firmware.
+<span class="st">Verified 104448 bytes ok.</span>
+Restarting the device.</pre>
+    </div>
+    <p>Al reiniciarse, el NXT muestra el logo y el menú de leJOS.</p>
+    <p>Si se queda en <code>Locating device in firmware update mode</code> sin avanzar, poner el NXT en modo de actualización a mano: con un clip, presionar el botón de reset que está dentro del orificio de la parte trasera, junto al puerto USB, durante <strong>más de 4 segundos</strong>. La pantalla queda en blanco y el NXT emite un <strong>tictac</strong> suave. Volver a ejecutar <code>nxjflash</code>.</p>
 
-    <p>Después de instalarlo, preparar el NXT para el Bluetooth del paso 7:</p>
+    <p class="sub">6.5 · Los demás NXT y la Integridad de memoria</p>
+    <ul>
+      <li>Para cada NXT siguiente, alcanza con conectarlo, encenderlo y repetir el paso 6.4.</li>
+      <li>Al terminar con todos, decidir qué hacer con la Integridad de memoria:
+        <ul>
+          <li>Si los programas se van a subir por <strong>Bluetooth</strong> (lo que propone esta guía): <strong>volver a activarla</strong> y reiniciar. El Bluetooth no usa el driver Fantom.</li>
+          <li>Si se van a subir por <strong>USB</strong>: dejarla desactivada en esa computadora (ver «Usar USB en lugar de Bluetooth»).</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p>Después de instalar el firmware, preparar el NXT para el Bluetooth del paso 7:</p>
     <ul>
       <li>En el menú <strong>Bluetooth</strong>, dejar <strong>Power</strong> encendido y <strong>Visibility</strong> activada.</li>
       <li>El PIN por defecto es <strong>1234</strong>.</li>
     </ul>
 
     <span class="badge warn">Si el USB no funciona</span>
-    <p>Si al ejecutar <code>nxjflashg</code> aparece el error <code>cannot load library ... jfantom.dll</code>, Windows 11 está bloqueando el driver Fantom (ver la sección «Usar USB en lugar de Bluetooth»). Como el firmware se instala una sola vez por brick, las opciones son:</p>
-    <ul>
-      <li>Hacer la instalación en otra computadora donde el USB del NXT funcione y después volver a la Ceibalita para programar por Bluetooth. Una computadora con <strong>Ubuntu</strong> es una buena opción: ver la guía <a href="GuiaNXT-lejos-linux.html">Programar el NXT en Java desde Linux</a>.</li>
-      <li>Desactivar temporalmente la <strong>Integridad de memoria</strong> (Seguridad de Windows → Seguridad del dispositivo → Aislamiento del núcleo), reiniciar, instalar el firmware y <strong>volver a activarla</strong> al terminar, con otro reinicio.</li>
-    </ul>
+    <p>Ejecutar el diagnóstico de la sección <a href="#diagnostico">«Diagnóstico del USB»</a>: indica cuál de las tres condiciones falta. Si no hay forma de cumplirlas (por ejemplo, en una computadora administrada), instalar el firmware desde una computadora con <strong>Ubuntu</strong>, donde leJOS no necesita el driver Fantom: ver la guía <a href="GuiaNXT-lejos-linux.html">Programar el NXT en Java desde Linux</a>. Después se vuelve a Windows para programar por Bluetooth.</p>
 
     <span class="badge ok">Si algo sale mal</span>
-    <p>Si el proceso se corta (cable desconectado, pilas agotadas), el NXT puede quedar con la pantalla en blanco haciendo tictac. No está dañado: el modo de actualización está grabado de fábrica y no se borra. Volver a ejecutar <code>nxjflashg</code> y repetir la instalación.</p>
+    <p>Si el proceso se corta (cable desconectado, pilas agotadas), el NXT puede quedar con la pantalla en blanco haciendo tictac. No está dañado: el modo de actualización está grabado de fábrica y no se borra. Volver a ejecutar <code>nxjflash</code> y repetir la instalación.</p>
   </div>
 </div>
 
@@ -630,7 +724,7 @@ code $base</pre>
     <tr><td><code>nxjbrowse</code></td><td>Ver, ejecutar, borrar y renombrar programas del NXT.</td></tr>
     <tr><td><code>nxjcontrol</code></td><td>Panel completo: archivos, motores, lecturas de sensores en vivo.</td></tr>
     <tr><td><code>nxjconsole</code></td><td>Muestra en la PC lo que el programa escribe con <code>RConsole.println()</code>. Útil para depurar.</td></tr>
-    <tr><td><code>nxjflashg</code></td><td>Instalar o reinstalar el firmware leJOS (requiere USB y borra los programas).</td></tr>
+    <tr><td><code>nxjflash</code> / <code>nxjflashg</code></td><td>Instalar o reinstalar el firmware leJOS, en consola o con ventana (requiere USB y borra los programas).</td></tr>
   </table>
   </div>
 </div>
@@ -638,8 +732,37 @@ code $base</pre>
 <div class="panel" id="usb">
   <span class="badge opt">Opcional · conexión por USB</span>
   <p class="panel-title">Usar USB en lugar de Bluetooth</p>
-  <p>Requiere el driver <strong>Fantom</strong> de LEGO (versión de 64 bits, disponible en el release <code>instaladores-nxt</code> del repositorio openRoberta-NXT), instalado como administrador y con reinicio. En el <code>tasks.json</code>, cambiar <code>-b</code> por <code>-u</code>.</p>
-  <p>En Windows 11 es frecuente que falle con el error <code>cannot load library ... jfantom.dll</code> / <em>Error en una rutina de inicialización de biblioteca de vínculos dinámicos (DLL)</em>, aunque el driver esté instalado. La causa más probable es la <strong>Integridad de memoria</strong> (Seguridad de Windows → Seguridad del dispositivo → Aislamiento del núcleo), que bloquea los componentes antiguos de National Instruments. Desactivarla reduce la seguridad del equipo, por lo que se recomienda usar Bluetooth.</p>
+  <p>Requiere lo mismo que la instalación del firmware: Integridad de memoria desactivada, driver Fantom completo (con el Driver Support) y leJOS usando el JDK 8 de 32 bits (pasos 6.1 a 6.3). En el <code>tasks.json</code>, cambiar <code>-b</code> por <code>-u</code>.</p>
+  <p>La Integridad de memoria tiene que quedar <strong>desactivada de forma permanente</strong> en esa computadora: si se vuelve a activar, el USB deja de funcionar con el error <code>Cannot load NXTComm driver</code>. Como desactivarla reduce la seguridad del equipo, se recomienda programar por Bluetooth y usar el USB solo para instalar el firmware.</p>
+</div>
+
+<div class="panel" id="diagnostico">
+  <span class="badge warn">Windows 11 · USB</span>
+  <p class="panel-title">Diagnóstico del USB (driver Fantom)</p>
+  <p>Si <code>nxjflash</code>, <code>nxjbrowse</code> o <code>nxj -u</code> muestran <code>Cannot load NXTComm driver</code>, pegar este script en PowerShell. Revisa las tres condiciones del paso 6.</p>
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="label">PowerShell</span><button type="button">Copiar</button></div>
+    <pre>$j = $env:LEJOS_NXT_JAVA_HOME
+"LEJOS_NXT_JAVA_HOME: $j"
+if ($j -and (Test-Path "$j\bin\java.exe")) {
+  $v = (&amp; "$j\bin\java.exe" -version 2&gt;&amp;1) -join " "
+  "Java de leJOS:         " + $(if ($v -match "64-Bit") { "64 bits -&gt; PROBLEMA (paso 6.3)" } else { "32 bits -&gt; OK" })
+} else { "Java de leJOS:         no encontrado -&gt; PROBLEMA (paso 6.3)" }
+$dg = Get-CimInstance -Namespace root\Microsoft\Windows\DeviceGuard -ClassName Win32_DeviceGuard
+"Integridad de memoria: " + $(if ($dg.SecurityServicesRunning -contains 2) { "ACTIVADA -&gt; PROBLEMA (paso 6.1)" } else { "desactivada -&gt; OK" })
+"fantom.dll (32 bits):  " + $(if (Test-Path C:\Windows\SysWOW64\fantom.dll) { "OK" } else { "falta -&gt; PROBLEMA (paso 6.2)" })
+"Paquetes LEGO instalados:"
+Get-Package | Where-Object Name -match "LEGO" | ForEach-Object { "  " + $_.Name }</pre>
+  </div>
+  <p>En la lista de paquetes tienen que aparecer el driver y el <strong>Driver Support</strong>. Si todo da OK y el error sigue, reinstalar el Driver Support con el script del paso 6.2 y reiniciar.</p>
+  <p>El mensaje completo del error también orienta:</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>El error dice…</th><th>Causa</th></tr>
+    <tr><td><code>architecture windows/amd64</code></td><td>leJOS está usando un Java de 64 bits (paso 6.3).</td></tr>
+    <tr><td><code>architecture windows/x86</code> + <em>Error en una rutina de inicialización de biblioteca de vínculos dinámicos (DLL)</em></td><td>El Java es correcto, pero el driver Fantom no puede arrancar: Integridad de memoria activada o falta el Driver Support (pasos 6.1 y 6.2).</td></tr>
+  </table>
+  </div>
 </div>
 
 <div class="note" id="problemas">
@@ -658,8 +781,17 @@ code $base</pre>
     <dt>Error al subir: la clase no tiene main</dt>
     <dd>Se presionó Ctrl + Shift + B con una clase auxiliar abierta. Abrir el archivo del programa (el que tiene <code>main</code>) y repetir.</dd>
 
+    <dt>«Cannot load NXTComm driver» al usar USB (por ejemplo, con nxjflash)</dt>
+    <dd>Falta alguna de las tres condiciones del paso 6: Integridad de memoria desactivada, driver Fantom con el Driver Support, o leJOS usando el JDK de 32 bits. Ejecutar el script de <a href="#diagnostico">Diagnóstico del USB</a>.</dd>
+
+    <dt>«Internal Error 2711» al instalar el driver Fantom</dt>
+    <dd>Falló la parte Driver Support. Responder Sí para continuar e instalarla aparte con el script del paso 6.2.</dd>
+
     <dt>Error de librería nativa o de 32 bits</dt>
     <dd>leJOS está usando un JDK de 64 bits. Verificar que <code>LEJOS_NXT_JAVA_HOME</code> apunte a <code>C:\Java\jdk8-32</code> y abrir una terminal nueva.</dd>
+
+    <dt>«El término … no se reconoce» al ejecutar una ruta en PowerShell</dt>
+    <dd>La ruta tiene espacios. Escribirla entre comillas y con <code>&amp;</code> delante: <code>&amp; "C:\Program Files (x86)\leJOS NXJ\bin\nxjflash.bat"</code>.</dd>
 
     <dt>«illegal character: '\ufeff'» al compilar</dt>
     <dd>El archivo <code>.java</code> se guardó con BOM. En VS Code, hacer clic en la codificación de la barra inferior (<em>UTF-8 with BOM</em>) y elegir <strong>Guardar con codificación → UTF-8</strong>.</dd>
@@ -686,6 +818,7 @@ code $base</pre>
     <li><label><input type="checkbox"> leJOS NXJ 0.9.1beta-3 instalado</label></li>
     <li><label><input type="checkbox"> <code>NXJ_HOME</code> y <code>LEJOS_NXT_JAVA_HOME</code> correctas</label></li>
     <li><label><input type="checkbox"> NXT con firmware leJOS (paso 6, si hacía falta)</label></li>
+    <li><label><input type="checkbox"> Integridad de memoria reactivada al terminar de flashear (si se programa por Bluetooth)</label></li>
     <li><label><input type="checkbox"> Bluetooth del NXT encendido y visible</label></li>
     <li><label><input type="checkbox"> NXT emparejado con la computadora (PIN 1234)</label></li>
     <li><label><input type="checkbox"> VS Code instalado (con <code>code</code> en el PATH) y Extension Pack for Java</label></li>
